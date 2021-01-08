@@ -1,0 +1,53 @@
+﻿<Page
+    x:Class="HermodsLarobok.Views.EbooksPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:HermodsLarobok.Views"
+    xmlns:viewModels="using:HermodsLarobok.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <GridView x:Name="EbooksGrid" ItemsSource="{x:Bind Ebooks}" SelectionChanged="EbooksListView_SelectionChanged">
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="5, 5, 5, 5"/>
+                </Style>
+            </GridView.ItemContainerStyle>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid x:Name="MaxItemsWrapGrid"
+                           MaximumRowsOrColumns="3"
+                           Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+            <GridView.ItemTemplate>
+                <DataTemplate x:Name="ImageOverlayTemplate">
+                    <Grid Width="200" Height="300">
+                        <Image Stretch="UniformToFill">
+                            <Image.Source>
+                                <BitmapImage UriSource="{Binding FrontPagePath}"/>
+                            </Image.Source>
+                        </Image>
+
+                        <StackPanel Orientation="Vertical" Height="40" VerticalAlignment="Bottom" Padding="5,1,45,1" Background="LightGray" Opacity=".75">
+                            <TextBlock Text="{Binding Title}"/>
+                        </StackPanel>
+                        <CommandBar Background="Transparent" IsOpen="False" DefaultLabelPosition="Right" VerticalAlignment="Bottom">
+                            <AppBarButton Icon="Pin" Label="Fäst" Command="{Binding Pin}" IsEnabled="{Binding IsDownloaded}" />
+                            <AppBarButton Icon="Download" Label="Ladda ner" Command="{Binding Download}" IsEnabled="{Binding IsDownloadable}" />
+                        </CommandBar>
+                        <ProgressRing IsActive="{Binding IsDownloading}" />
+                    </Grid>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+        <CommandBar Background="Transparent" IsOpen="False" DefaultLabelPosition="Right" VerticalAlignment="Bottom">
+            <AppBarButton Icon="Refresh" Label="Refresh" Click="AppBarButton_Click"/>
+        </CommandBar>
+
+    </Grid>
+</Page>

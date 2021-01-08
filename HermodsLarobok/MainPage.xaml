@@ -8,7 +8,47 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <VisualStateManager.VisualStateGroups>
+        <VisualStateGroup>
+            <VisualState>
+                <VisualState.StateTriggers>
+                    <AdaptiveTrigger
+                        MinWindowWidth="{x:Bind NavViewCompactModeThresholdWidth}"/>
+                </VisualState.StateTriggers>
+                <VisualState.Setters>
+                    <!--Remove the next 3 lines for left-only navigation.-->
+                    <Setter Target="NavView.PaneDisplayMode" Value="Top"/>
+                    <Setter Target="NavViewSearchBox.Width" Value="200"/>
+                    <Setter Target="MainPagesHeader.Visibility" Value="Collapsed"/>
+                    <!--Leave the next line for left-only navigation.-->
+                    <Setter Target="ContentFrame.Padding" Value="24,0,24,24"/>
+                </VisualState.Setters>
+            </VisualState>
+        </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
 
-    </Grid>
+    <NavigationView x:Name="NavView" Loaded="NavView_Loaded" ItemInvoked="NavView_ItemInvoked" 
+                    BackRequested="NavView_BackRequested">
+        <NavigationView.MenuItems>
+            <NavigationViewItem Tag="home" Content="Hem">
+                <NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF404;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Tag="ebooks" Content="Mina läromedel">
+                <NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8F1;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
+        <NavigationView.AutoSuggestBox>
+            <!--See AutoSuggestBox documentation for
+                 more info about how to implement search.-->
+            <AutoSuggestBox x:Name="NavViewSearchBox" QueryIcon="Find"/>
+        </NavigationView.AutoSuggestBox>
+
+        <Frame x:Name="ContentFrame" Padding="12,0,12,24" IsTabStop="True"
+                   NavigationFailed="ContentFrame_NavigationFailed"/>
+
+    </NavigationView>
 </Page>

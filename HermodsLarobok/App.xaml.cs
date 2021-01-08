@@ -1,4 +1,8 @@
-﻿using System;
+﻿using HermodsLarobok.Clients;
+using HermodsLarobok.Storage;
+using HermodsLarobok.Views;
+using Nito.AsyncEx;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +11,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -22,6 +27,8 @@ namespace HermodsLarobok
     /// </summary>
     sealed partial class App : Application
     {
+        public static HermodsNovoClient HermodsNovoClient = new HermodsNovoClient();
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -63,14 +70,38 @@ namespace HermodsLarobok
             {
                 if (rootFrame.Content == null)
                 {
-                    // When the navigation stack isn't restored navigate to the first page,
-                    // configuring the new page by passing required information as a navigation
-                    // parameter
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    var settings = ApplicationData.Current.LocalSettings;
+
+                    if (!settings.Values.ContainsKey("username"))
+                        rootFrame.Navigate(typeof(LoginPage), e.Arguments);
+                    else
+                    {
+                        // When the navigation stack isn't restored navigate to the first page,
+                        // configuring the new page by passing required information as a navigation
+                        // parameter
+                        rootFrame.Navigate(typeof(MainPage), e.Arguments);
+
+                        AsyncContext.Run(async () => await HermodsNovoClient.AuthenticateWithAsync(settings.Values["username"] as string, settings.Values["password"] as string));
+                    }
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+
+            if(e.TileId != null && e.TileId.StartsWith("isbn-"))
+            {
+                AsyncContext.Run(async () =>
+                {
+                    var decoder = new WwwFormUrlDecoder(e.Arguments);
+                    var ebook = await EbookStorage.GetEbookAsync(decoder.GetFirstValueByName("isbn"));
+                    await ReadingPage.TryShowWindowAsync(ebook);
+                });
+            }
+        }
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
         }
 
         /// <summary>
