@@ -122,6 +122,8 @@
     <Compile Include="Clients\HermodsNovoClient.cs" />
     <Compile Include="Clients\LiberOnlinebokClient.cs" />
     <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Extensions\DependencyObjectExtensions.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Helpers\HermodsNovoHelper.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -131,6 +133,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EbookDownloadService.cs" />
     <Compile Include="Storage\EbookStorage.cs" />
+    <Compile Include="Storage\InkStorage.cs" />
     <Compile Include="Storage\PageStorage.cs" />
     <Compile Include="ViewModels\EbookOpeningViewModel.cs" />
     <Compile Include="ViewModels\EbookViewModel.cs" />

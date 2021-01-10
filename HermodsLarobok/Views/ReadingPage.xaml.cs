@@ -70,33 +70,46 @@ namespace HermodsLarobok.Views
             base.OnNavigatedTo(e);
         }
 
-        private void FlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void EbookFlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Settings.Values["selectedIndex"] = EbookFlipView.SelectedIndex;
+
+            {
+                await _loadInkForOpeningAsync(e.AddedItems[0] as EbookOpeningViewModel);
+            }
+
+            if (e.RemovedItems.Count == 1)
+            {
+                await _saveInkForOpeningAsync(e.RemovedItems[0] as EbookOpeningViewModel);
+            }
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             Settings = ApplicationData.Current.RoamingSettings.CreateContainer(Ebook.Isbn, ApplicationDataCreateDisposition.Always);
 
-            AsyncContext.Run(async () =>
+            Task.Run(async () =>
             {
+                // Do at the same time
                 var pages = await PageStorage.GetPagePathsAsync(Ebook.Isbn);
+                var ink = await InkStorage.GetInkPathsAsync(Ebook.Isbn);
 
                 var selectedIndex = (int)Settings.Values["selectedIndex"];
 
-                EbookOpenings.Add(new EbookOpeningViewModel(null, pages[0]));
+                EbookOpenings.Add(new EbookOpeningViewModel(null, pages[0], ink?.DefaultIfEmpty(null).FirstOrDefault(i => i?.Split('.')[0] == "0")));
 
                 for (int i = 1; i < pages.Length; i++)
                 {
-                    EbookOpenings.Add(new EbookOpeningViewModel(pages[i], i + 1 == pages.Length ? null : pages[i + 1]));
+                    EbookOpenings.Add(new EbookOpeningViewModel(pages[i], i + 1 == pages.Length ? null : pages[i + 1], ink?.DefaultIfEmpty(null).FirstOrDefault(_ => _.Split('.')[0] == i.ToString())));
                     i++;
                 }
+
+                EbookFlipView.SelectionChanged += EbookFlipView_SelectionChanged;
 
                 Settings.Values["selectedIndex"] = EbookFlipView.SelectedIndex = selectedIndex;
 
                 LoadingProgressRing.IsActive = false;
-            });
+            }).Forget();
         }
 
         #region Mouse Panning
@@ -145,6 +158,8 @@ namespace HermodsLarobok.Views
 
         #endregion Mouse Panning
 
+        #region TryShowWindow
+
         public static async Task TryShowWindowAsync(Ebook ebook) => await TryShowWindowAsync(new EbookViewModel(ebook));
 
         public static async Task<bool> TryShowWindowAsync(EbookViewModel ebookViewModel)
@@ -159,6 +174,10 @@ namespace HermodsLarobok.Views
 
             return await readingWindow.TryShowAsync();
         }
+
+        #endregion TryShowWindow
+
+        #region Right-Click Menu
 
         private void CopyLinkButton_Click(object sender, RoutedEventArgs e)
         {
@@ -176,6 +195,59 @@ namespace HermodsLarobok.Views
             FlyoutBase flyoutBase = FlyoutBase.GetAttachedFlyout(senderElement);
             //flyoutBase.ShowAt(senderElement);
             flyoutBase.ShowAt(sender as UIElement, new FlyoutShowOptions() { Position = e.GetPosition(sender as UIElement) });
+        }
+
+        #endregion Right-Click Menu
+
+        #region Ink
+
+        private async Task _loadInkForOpeningAsync(EbookOpeningViewModel opening)
+        {
+            var container = EbookFlipView.ContainerFromItem(opening);
+
+            if (container != null)
+            {
+                var item = container as FlipViewItem;
+                var index = EbookFlipView.Items.IndexOf(opening);
+
+                InkCanvas ink = item.FindVisualChildren<InkCanvas>().FirstOrDefault();
+
+                if (ink.InkPresenter.StrokeContainer.GetStrokes().Count == 0)
+                {
+                    await InkStorage.LoadInkAsync(Ebook.Isbn, index, ink.InkPresenter.StrokeContainer);
+
+                    Image inkImage = item.FindVisualChildren<Image>().FirstOrDefault(i => i.Name == "TemporaryInkImage");
+
+                    if (inkImage != null)
+                        inkImage.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private async Task _saveInkForOpeningAsync(EbookOpeningViewModel opening)
+        {
+            var deselectedItem = EbookFlipView.ContainerFromItem(opening) as FlipViewItem;
+
+            if (deselectedItem != null)
+            {
+                var deselectedIndex = EbookFlipView.Items.IndexOf(opening);
+
+                var ink = deselectedItem.FindVisualChildren<InkCanvas>().FirstOrDefault();
+
+                await InkStorage.SaveInkAsync(Ebook.Isbn, deselectedIndex, ink.InkPresenter.StrokeContainer);
+            }
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+        }
+
+        #endregion Ink
+
+        private async void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            await _saveInkForOpeningAsync(EbookFlipView.SelectedItem as EbookOpeningViewModel);
         }
     }
 }

@@ -7,10 +7,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Loaded="Page_Loaded"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Unloaded="Page_Unloaded">
 
     <Grid x:Name="MainGrid">
-        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}" SelectionChanged="FlipView_SelectionChanged">
+        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}">
             <FlipView.ItemTemplate>
                 <DataTemplate>
                     <ScrollViewer 
@@ -24,28 +24,32 @@
                         PointerPressed="MainScrollviewer_PointerPressed"
                         PointerMoved="MainScrollviewer_PointerMoved"
                         PointerReleased="MainScrollviewer_PointerReleased">
-                        <Grid Width="{Binding Path=ViewportWidth, ElementName=ScrollViewerMain}" RightTapped="Grid_RightTapped">
-                            <FlyoutBase.AttachedFlyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk" Icon="Link" Click="CopyLinkButton_Click"/>
-                                </MenuFlyout>
-                            </FlyoutBase.AttachedFlyout>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Image x:Name="LeftImage" Stretch="Uniform" HorizontalAlignment="Right" VerticalAlignment="Center"
+                        <Grid Width="{Binding Path=ViewportWidth, ElementName=ScrollViewerMain}">
+                            <Grid HorizontalAlignment="Center" RightTapped="Grid_RightTapped">
+                                <FlyoutBase.AttachedFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk" Icon="Link" Click="CopyLinkButton_Click"/>
+                                    </MenuFlyout>
+                                </FlyoutBase.AttachedFlyout>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Image x:Name="LeftImage" Stretch="Uniform" HorizontalAlignment="Right" VerticalAlignment="Center"
                                    MaxHeight="{Binding Path=ViewportHeight, ElementName=ScrollViewerMain}">
-                                <Image.Source>
-                                    <BitmapImage UriSource="{Binding LeftPagePath}"/>
-                                </Image.Source>
-                            </Image>
-                            <Image x:Name="RightImage" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1"
+                                    <Image.Source>
+                                        <BitmapImage UriSource="{Binding LeftPagePath}"/>
+                                    </Image.Source>
+                                </Image>
+                                <Image x:Name="RightImage" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1"
                                    MaxHeight="{Binding Path=ViewportHeight, ElementName=ScrollViewerMain}">
-                                <Image.Source>
-                                    <BitmapImage UriSource="{Binding RightPagePath}"/>
-                                </Image.Source>
-                            </Image>
+                                    <Image.Source>
+                                        <BitmapImage UriSource="{Binding RightPagePath}"/>
+                                    </Image.Source>
+                                </Image>
+                                <Image x:Name="TemporaryInkImage" Grid.ColumnSpan="2" Source="{Binding InkPath}" />
+                                <InkCanvas x:Name="InkCanvasControl" Grid.ColumnSpan="2" />
+                            </Grid>
                         </Grid>                        
                     </ScrollViewer>                    
                 </DataTemplate>

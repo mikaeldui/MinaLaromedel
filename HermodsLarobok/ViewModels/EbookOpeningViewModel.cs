@@ -12,30 +12,51 @@ namespace HermodsLarobok.ViewModels
     {
         private string _leftPagePath;
         private string _rightPagePath;
+        private string _inkPath;
 
-        public EbookOpeningViewModel(string leftPagePath, string rightPagePath)
+        public EbookOpeningViewModel(string leftPagePath, string rightPagePath, string inkPath = null)
         {
             _leftPagePath = leftPagePath;
             _rightPagePath = rightPagePath;
+            _inkPath = inkPath;
         }
 
         public string LeftPagePath
         {
-            get { return _leftPagePath; }
+            get => _leftPagePath;
             set
             {
-                _leftPagePath = value;
-                RaisePropertyChanged();
+                if (_leftPagePath != value)
+                {
+                    _leftPagePath = value;
+                    RaisePropertyChanged();
+                }
             }
         }
 
         public string RightPagePath
         {
-            get { return _rightPagePath; }
+            get => _rightPagePath;
             set
             {
-                _rightPagePath = value;
-                RaisePropertyChanged();
+                if (_rightPagePath != value)
+                {
+                    _rightPagePath = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public string InkPath
+        {
+            get => _inkPath;
+            set
+            {
+                if (_inkPath != value)
+                {
+                    _inkPath = value;
+                    RaisePropertyChanged();
+                }
             }
         }
     }
