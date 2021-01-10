@@ -1,4 +1,6 @@
-﻿using HermodsLarobok.Models;
+﻿using GalaSoft.MvvmLight.Messaging;
+using HermodsLarobok.Messages;
+using HermodsLarobok.Models;
 using HermodsLarobok.Services;
 using HermodsLarobok.Storage;
 using HermodsLarobok.ViewModels;
@@ -10,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -58,6 +61,11 @@ namespace HermodsLarobok.Views
                 //    Ebook = new EbookViewModel(await EbookStorage.GetEbooksAsync(isbn));
                 //    break;
             }
+
+            Messenger.Default.Register<ShowEbookPageMessage>(this, Ebook.Isbn, message => 
+            {
+                EbookFlipView.SelectedIndex = message.PageNumber / 2;
+            });
 
             base.OnNavigatedTo(e);
         }
@@ -150,6 +158,24 @@ namespace HermodsLarobok.Views
             ElementCompositionPreview.SetAppWindowContent(readingWindow, readingWindowContentFrame);
 
             return await readingWindow.TryShowAsync();
+        }
+
+        private void CopyLinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            DataPackage dataPackage = new DataPackage();
+            dataPackage.RequestedOperation = DataPackageOperation.Copy;
+            dataPackage.SetText($"hermodsebook:{Ebook.Isbn}?page={EbookFlipView.SelectedIndex * 2}");
+            Clipboard.SetContent(dataPackage);
+        }
+
+        private void Grid_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            FrameworkElement senderElement = sender as FrameworkElement;
+            // If you need the clicked element:
+            // Item whichOne = senderElement.DataContext as Item;
+            FlyoutBase flyoutBase = FlyoutBase.GetAttachedFlyout(senderElement);
+            //flyoutBase.ShowAt(senderElement);
+            flyoutBase.ShowAt(sender as UIElement, new FlyoutShowOptions() { Position = e.GetPosition(sender as UIElement) });
         }
     }
 }

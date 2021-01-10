@@ -1,4 +1,6 @@
-﻿using HermodsLarobok.Clients;
+﻿using GalaSoft.MvvmLight.Messaging;
+using HermodsLarobok.Clients;
+using HermodsLarobok.Messages;
 using HermodsLarobok.Storage;
 using HermodsLarobok.Views;
 using Nito.AsyncEx;
@@ -101,7 +103,18 @@ namespace HermodsLarobok
 
         protected override void OnActivated(IActivatedEventArgs args)
         {
-            base.OnActivated(args);
+            if (args.Kind == ActivationKind.Protocol)
+            {
+                ProtocolActivatedEventArgs eventArgs = args as ProtocolActivatedEventArgs;
+                // TODO: Handle URI activation
+                // The received URI is eventArgs.Uri.AbsoluteUri
+
+                if (eventArgs.Uri.Scheme == "hermodsebook")
+                {
+                    var decoder = new WwwFormUrlDecoder(eventArgs.Uri.Query);
+                    Messenger.Default.Send(new ShowEbookPageMessage { PageNumber = int.Parse(decoder.GetFirstValueByName("page")) }, eventArgs.Uri.AbsolutePath);
+                }
+            }
         }
 
         /// <summary>

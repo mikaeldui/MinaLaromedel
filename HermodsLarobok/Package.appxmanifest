@@ -32,7 +32,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="HermodsLarobok.App">
       <uap:VisualElements
-        DisplayName="HermodsLarobok"
+        DisplayName="Hermods Läromedel"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="HermodsLarobok"
@@ -40,6 +40,16 @@
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <uap:ApplicationContentUriRules>
+        <uap:Rule Type="include" Match="" WindowsRuntimeAccess="none"/>
+      </uap:ApplicationContentUriRules>
+      <Extensions>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="hermodsebook">
+            <uap:DisplayName>Hermods E-book</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 
