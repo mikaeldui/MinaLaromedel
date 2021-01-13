@@ -17,6 +17,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -32,6 +33,8 @@ namespace HermodsLarobok
     /// </summary>
     sealed partial class App : Application
     {
+        public static Dictionary<EbookViewModel, AppWindow> ReadingWindows { get; } = new Dictionary<EbookViewModel, AppWindow>();
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().

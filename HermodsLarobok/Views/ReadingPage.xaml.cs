@@ -149,13 +149,23 @@ namespace HermodsLarobok.Views
 
         public static async Task<bool> TryShowWindowAsync(EbookViewModel ebookViewModel)
         {
+            if (App.ReadingWindows.ContainsKey(ebookViewModel))
+                return await App.ReadingWindows[ebookViewModel].TryShowAsync();            
+
             AppWindow readingWindow = await AppWindow.TryCreateAsync();
             readingWindow.Title = ebookViewModel.Title;
+
+            readingWindow.Closed += (sender, e) =>
+            {
+                App.ReadingWindows.Remove(App.ReadingWindows.First(_ => _.Value == sender).Key);
+            };
 
             Frame readingWindowContentFrame = new Frame();
             readingWindowContentFrame.Navigate(typeof(ReadingPage), ebookViewModel);
 
             ElementCompositionPreview.SetAppWindowContent(readingWindow, readingWindowContentFrame);
+
+            App.ReadingWindows.Add(ebookViewModel, readingWindow);
 
             return await readingWindow.TryShowAsync();
         }
