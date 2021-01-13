@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HermodsLarobok.Services;
+using HermodsNovo;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,16 +38,19 @@ namespace HermodsLarobok.Views
             LoginProgressRing.IsActive = true;
 
             // Login
-            if (await App.HermodsNovoClient.AuthenticateWithAsync(UsernameTextBox.Text, PasswordBoxControl.Password))
+            try
             {
-                var settings = ApplicationData.Current.RoamingSettings;
+                await EbookService.TryAuthenticateAsync(UsernameTextBox.Text, PasswordBoxControl.Password);
+                {
+                    var settings = ApplicationData.Current.RoamingSettings;
 
-                settings.Values["username"] = UsernameTextBox.Text;
-                settings.Values["password"] = PasswordBoxControl.Password;
+                    settings.Values["username"] = UsernameTextBox.Text;
+                    settings.Values["password"] = PasswordBoxControl.Password;
 
-                Frame.Navigate(typeof(MainPage));
+                    Frame.Navigate(typeof(MainPage));
+                }
             }
-            else
+            catch (HermodsNovoInvalidCredentialsException)
             {
                 // On Error
                 UsernameTextBox.IsEnabled = PasswordBoxControl.IsEnabled = LoginButton.IsEnabled = true;

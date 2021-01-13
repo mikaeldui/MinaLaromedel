@@ -6,12 +6,11 @@
     xmlns:viewModels="using:HermodsLarobok.ViewModels"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Loaded="Page_Loaded"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <GridView x:Name="EbooksGrid" ItemsSource="{x:Bind Ebooks}" SelectionChanged="EbooksListView_SelectionChanged">
+        <GridView x:Name="EbooksGrid" ItemsSource="{x:Bind Ebooks}" ItemClick="EbooksGrid_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
             <GridView.ItemContainerStyle>
                 <Style TargetType="GridViewItem">
                     <Setter Property="Margin" Value="5, 5, 5, 5"/>

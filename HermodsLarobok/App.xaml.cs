@@ -1,14 +1,17 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
-using HermodsLarobok.Clients;
 using HermodsLarobok.Messages;
+using HermodsLarobok.Services;
 using HermodsLarobok.Storage;
+using HermodsLarobok.ViewModels;
 using HermodsLarobok.Views;
-using Nito.AsyncEx;
+using HermodsNovo;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -29,8 +32,6 @@ namespace HermodsLarobok
     /// </summary>
     sealed partial class App : Application
     {
-        public static HermodsNovoClient HermodsNovoClient = new HermodsNovoClient();
-
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -72,9 +73,7 @@ namespace HermodsLarobok
             {
                 if (rootFrame.Content == null)
                 {
-                    var settings = ApplicationData.Current.LocalSettings;
-
-                    if (!settings.Values.ContainsKey("username"))
+                    if (!SettingsService.IsCredentialsSaved())
                         rootFrame.Navigate(typeof(LoginPage), e.Arguments);
                     else
                     {
@@ -82,8 +81,6 @@ namespace HermodsLarobok
                         // configuring the new page by passing required information as a navigation
                         // parameter
                         rootFrame.Navigate(typeof(MainPage), e.Arguments);
-
-                        AsyncContext.Run(async () => await HermodsNovoClient.AuthenticateWithAsync(settings.Values["username"] as string, settings.Values["password"] as string));
                     }
                 }
                 // Ensure the current window is active
@@ -92,12 +89,8 @@ namespace HermodsLarobok
 
             if(e.TileId != null && e.TileId.StartsWith("isbn-"))
             {
-                AsyncContext.Run(async () =>
-                {
-                    var decoder = new WwwFormUrlDecoder(e.Arguments);
-                    var ebook = await EbookStorage.GetEbookAsync(decoder.GetFirstValueByName("isbn"));
-                    await ReadingPage.TryShowWindowAsync(ebook);
-                });
+                var decoder = new WwwFormUrlDecoder(e.Arguments);
+                Messenger.Default.Send(new OpenEbookMessage(decoder.GetFirstValueByName("isbn")));
             }
         }
 

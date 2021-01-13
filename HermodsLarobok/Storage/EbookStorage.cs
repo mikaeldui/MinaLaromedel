@@ -1,5 +1,4 @@
-﻿using HermodsLarobok.Models;
-using Microsoft.Toolkit.Uwp.Helpers;
+﻿using HermodsNovo;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,24 +13,24 @@ namespace HermodsLarobok.Storage
 {
     public static class EbookStorage
     {
-        private const string KEY = "ebooksList";
+        private const string KEY = "ebooksList.json";
 
-        public static async Task<Ebook[]> GetEbooksAsync()
+        public static async Task<HermodsNovoEbook[]> GetEbooksAsync()
         {
             var helper = new LocalObjectStorageHelper();
 
             // Read complex/large objects 
             if (await helper.FileExistsAsync(KEY))
             {
-                return await helper.ReadFileAsync<Ebook[]>(KEY);
+                return await helper.ReadFileAsync<HermodsNovoEbook[]>(KEY);
             }
             else
                 return null;
         }
 
-        public static async Task<Ebook> GetEbookAsync(string isbn) => (await GetEbooksAsync()).First(eb => eb.Isbn == isbn);
+        public static async Task<HermodsNovoEbook> GetEbookAsync(string isbn) => (await GetEbooksAsync()).First(eb => eb.Isbn == isbn);
 
-        public static async Task SaveEbooksAsync(Ebook[] ebooks)
+        public static async Task SaveEbooksAsync(HermodsNovoEbook[] ebooks)
         {
             var helper = new LocalObjectStorageHelper();
             await helper.SaveFileAsync(KEY, ebooks);

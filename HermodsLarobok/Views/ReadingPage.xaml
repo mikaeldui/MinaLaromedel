@@ -5,12 +5,11 @@
     xmlns:local="using:HermodsLarobok.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Loaded="Page_Loaded"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid x:Name="MainGrid">
-        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}" SelectionChanged="FlipView_SelectionChanged">
+        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}">
             <FlipView.ItemTemplate>
                 <DataTemplate>
                     <ScrollViewer 

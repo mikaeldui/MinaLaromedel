@@ -1,4 +1,8 @@
-﻿using HermodsLarobok.Views;
+﻿using GalaSoft.MvvmLight.Messaging;
+using HermodsLarobok.Messages;
+using HermodsLarobok.Services;
+using HermodsLarobok.Storage;
+using HermodsLarobok.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -26,6 +31,16 @@ namespace HermodsLarobok
         public MainPage()
         {
             this.InitializeComponent();
+
+            Messenger.Default.Register<OpenEbookMessage>(this, async ebook =>
+            {
+                await EbookService.LoadEbooksAsync(Dispatcher);
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+                    await ReadingPage.TryShowWindowAsync(EbookService.Ebooks.First(eb => eb.Isbn == ebook.Isbn));
+                });
+            });
         }
 
         private double NavViewCompactModeThresholdWidth { get { return NavView.CompactModeThresholdWidth; } }
