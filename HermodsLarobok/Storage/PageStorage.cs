@@ -78,6 +78,32 @@ namespace HermodsLarobok.Storage
             return folders.Any(f => f.Name == ebook.Isbn);
         }
 
+        public static async Task<string> GetThumbnailPathAsync(HermodsNovoEbook ebook, int page = 1)
+        {
+            Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+
+            var thumbnailFolder = await storageFolder.CreateFolderAsync("thumbnails", CreationCollisionOption.OpenIfExists);
+            var thumbnailFile = await thumbnailFolder.CreateFileAsync($"{ebook.Isbn}.jpg", CreationCollisionOption.OpenIfExists);
+            var properties = await thumbnailFile.GetBasicPropertiesAsync();
+
+            if (properties.Size == 0)
+            {
+                var pageFile = await _getPageFileAsync(ebook, page);
+
+                var thumbnail = await pageFile.GetScaledImageAsThumbnailAsync(Windows.Storage.FileProperties.ThumbnailMode.DocumentsView, 150);
+
+                using (var stream = thumbnail.AsStreamForRead())
+                using (var outStream = await thumbnailFile.OpenStreamForWriteAsync())
+                {
+                    stream.Position = 0;
+                    await stream.CopyToAsync(outStream);
+                    await outStream.FlushAsync();
+                }
+            }
+
+            return "ms-appdata:///local/thumbnails/" + thumbnailFile.Name;
+        }
+
         private static async Task<StorageFile> _getPageFileAsync(HermodsNovoEbook ebook, int page)
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;

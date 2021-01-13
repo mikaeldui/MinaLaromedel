@@ -47,12 +47,14 @@ namespace HermodsLarobok.ViewModels
                 // clicks your tile, you can navigate them to the correct content
                 string arguments = "action=viewEbook&isbn=" + _ebook.Isbn;
 
+                var uri = new Uri(await PageStorage.GetThumbnailPathAsync(ebook));
+
                 // Initialize the tile with required arguments
                 SecondaryTile tile = new SecondaryTile(
                     "isbn-" + _ebook.Isbn,
                     _ebook.Title,
                     arguments,
-                    new Uri("ms-appx:///Assets/CityTiles/Square150x150Logo.png"),
+                    uri,
                     TileSize.Default);
 
                 if(await tile.RequestCreateAsync())
@@ -83,7 +85,7 @@ namespace HermodsLarobok.ViewModels
                 catch { }
             }
 
-            IsPinnable = !SecondaryTile.Exists(_ebook.Isbn);
+            IsPinnable = !SecondaryTile.Exists("isbn-" + _ebook.Isbn);
         }
 
         public string Title => _ebook.Title;
