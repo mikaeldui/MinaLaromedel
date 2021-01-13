@@ -5,12 +5,11 @@
     xmlns:local="using:HermodsLarobok.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Loaded="Page_Loaded"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid x:Name="MainGrid">
-        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}" SelectionChanged="FlipView_SelectionChanged">
+        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}">
             <FlipView.ItemTemplate>
                 <DataTemplate>
                     <ScrollViewer 
@@ -24,7 +23,12 @@
                         PointerPressed="MainScrollviewer_PointerPressed"
                         PointerMoved="MainScrollviewer_PointerMoved"
                         PointerReleased="MainScrollviewer_PointerReleased">
-                        <Grid Width="{Binding Path=ViewportWidth, ElementName=ScrollViewerMain}">
+                        <Grid Width="{Binding Path=ViewportWidth, ElementName=ScrollViewerMain}" RightTapped="Grid_RightTapped">
+                            <FlyoutBase.AttachedFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk" Icon="Link" Click="CopyLinkButton_Click"/>
+                                </MenuFlyout>
+                            </FlyoutBase.AttachedFlyout>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition />
@@ -45,6 +49,7 @@
                     </ScrollViewer>                    
                 </DataTemplate>
             </FlipView.ItemTemplate>
+            
         </FlipView>
         <ProgressRing x:Name="LoadingProgressRing" Height="100" Width="100" IsActive="True" />
     </Grid>

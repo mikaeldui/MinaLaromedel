@@ -1,4 +1,4 @@
-﻿using HermodsLarobok.Models;
+﻿using HermodsNovo;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +12,7 @@ namespace HermodsLarobok.Storage
 {
     public static class PageStorage
     {
-        public static async Task SavePageAsync(Ebook ebook, Stream image, int page)
+        public static async Task SavePageAsync(HermodsNovoEbook ebook, Stream image, int page)
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
 
@@ -27,7 +27,7 @@ namespace HermodsLarobok.Storage
             }
         }
 
-        public static async Task SaveEbookAsync(Ebook ebook, Stream[] pages)
+        public static async Task SaveEbookAsync(HermodsNovoEbook ebook, Stream[] pages)
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
 
@@ -46,18 +46,9 @@ namespace HermodsLarobok.Storage
             }
         }
 
-        private static async Task<StorageFile> _getPageFileAsync(Ebook ebook, int page)
-        {
-            Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+        public static async Task<string> GetPagePathAsync(HermodsNovoEbook ebook, int page) => (await _getPageFileAsync(ebook, page)).Path;
 
-            var ebookFolder = await storageFolder.GetFolderAsync(ebook.Isbn);
-
-            return await ebookFolder.GetFileAsync($"{page}.jpg");
-        }
-
-        public static async Task<string> GetPagePathAsync(Ebook ebook, int page) => (await _getPageFileAsync(ebook, page)).Path;
-
-        public static async Task<string[]> GetPagePathsAsync(Ebook ebook) => await GetPagePathsAsync(ebook.Isbn);
+        public static async Task<string[]> GetPagePathsAsync(HermodsNovoEbook ebook) => await GetPagePathsAsync(ebook.Isbn);
 
         public static async Task<string[]> GetPagePathsAsync(string isbn)
         {
@@ -68,7 +59,7 @@ namespace HermodsLarobok.Storage
             return (await ebookFolder.GetFilesAsync()).OrderBy(pf => pf.Name.Split('.')[0].PadLeft(5, '0')).Select(pf => pf.Path).ToArray();
         }
 
-        public static async Task<BitmapImage> GetPageImageAsync(Ebook ebook, int page)
+        public static async Task<BitmapImage> GetPageImageAsync(HermodsNovoEbook ebook, int page)
         {
             using (var stream = await (await _getPageFileAsync(ebook, page)).OpenReadAsync())
             {
@@ -78,13 +69,22 @@ namespace HermodsLarobok.Storage
             }
         }
 
-        public static async Task<bool> EbookExistsAsync(Ebook ebook)
+        public static async Task<bool> EbookExistsAsync(HermodsNovoEbook ebook)
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
 
             var folders = await storageFolder.GetFoldersAsync();
 
             return folders.Any(f => f.Name == ebook.Isbn);
+        }
+
+        private static async Task<StorageFile> _getPageFileAsync(HermodsNovoEbook ebook, int page)
+        {
+            Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+
+            var ebookFolder = await storageFolder.GetFolderAsync(ebook.Isbn);
+
+            return await ebookFolder.GetFileAsync($"{page}.jpg");
         }
     }
 }

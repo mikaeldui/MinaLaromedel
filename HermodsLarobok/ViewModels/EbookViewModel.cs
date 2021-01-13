@@ -1,9 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
-using HermodsLarobok.Clients;
-using HermodsLarobok.Models;
 using HermodsLarobok.Services;
 using HermodsLarobok.Storage;
-using Nito.AsyncEx;
+using HermodsNovo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,14 +17,14 @@ namespace HermodsLarobok.ViewModels
 {
     public class EbookViewModel : ViewModelBase
     {
-        public Ebook _ebook;
+        public HermodsNovoEbook _ebook;
         private bool _isDownloaded = false;
         private bool _isDownloading = false;
         private bool _isDownloadable = false;
         private string _frontPagePath;
         private bool _isPinnable = false;
 
-        public EbookViewModel(Ebook ebook) 
+        public EbookViewModel(HermodsNovoEbook ebook) 
         {
             _ebook = ebook;
 
@@ -35,12 +33,10 @@ namespace HermodsLarobok.ViewModels
                 IsDownloadable = false;
                 IsDownloading = true;
 
-                await EbookDownloadService.DownloadEbookAsync(_ebook);
+                await EbookService.DownloadEbookAsync(_ebook);
 
                 IsDownloading = false;
                 IsDownloaded = true;
-
-                NetworkInformation.NetworkStatusChanged -= NetworkInformation_NetworkStatusChanged;
 
                 FrontPagePath = await PageStorage.GetPagePathAsync(_ebook, 1);
             });
@@ -66,14 +62,9 @@ namespace HermodsLarobok.ViewModels
 
             });
 
-            AsyncContext.Run(_asyncInit);            
+            _ = _asyncInit();            
         }
 
-        private async void NetworkInformation_NetworkStatusChanged(object sender)
-        {
-            if (IsDownloaded) return;
-            await _asyncInit();
-        }
 
         private async Task _asyncInit()
         {
@@ -81,8 +72,6 @@ namespace HermodsLarobok.ViewModels
             {
                 if (NetworkInformation.GetInternetConnectionProfile() != null)
                     IsDownloadable = true;
-
-                NetworkInformation.NetworkStatusChanged += NetworkInformation_NetworkStatusChanged;
             }
             else
             {

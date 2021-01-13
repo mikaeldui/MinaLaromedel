@@ -1,8 +1,9 @@
-﻿using HermodsLarobok.Models;
+﻿using GalaSoft.MvvmLight.Messaging;
+using HermodsLarobok.Messages;
 using HermodsLarobok.Services;
 using HermodsLarobok.Storage;
 using HermodsLarobok.ViewModels;
-using Nito.AsyncEx;
+using HermodsNovo;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,9 +11,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
@@ -59,36 +62,41 @@ namespace HermodsLarobok.Views
                 //    break;
             }
 
+            Messenger.Default.Register<ShowEbookPageMessage>(this, Ebook.Isbn, message => 
+            {
+                EbookFlipView.SelectedIndex = message.PageNumber / 2;
+            });
+
+            Settings = ApplicationData.Current.RoamingSettings.CreateContainer(Ebook.Isbn, ApplicationDataCreateDisposition.Always);
+
+            _ = Task.Run(async () =>
+            {
+                var pages = await PageStorage.GetPagePathsAsync(Ebook.Isbn);
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    EbookOpenings.Add(new EbookOpeningViewModel(null, pages[0]));
+
+                    for (int i = 1; i < pages.Length; i++)
+                    {
+                        EbookOpenings.Add(new EbookOpeningViewModel(pages[i], i + 1 == pages.Length ? null : pages[i + 1]));
+                        i++;
+                    }
+
+                    EbookFlipView.SelectedIndex = (int)Settings.Values["selectedIndex"];
+
+                    EbookFlipView.SelectionChanged += FlipView_SelectionChanged;
+
+                    LoadingProgressRing.IsActive = false;
+                });
+            });
+
             base.OnNavigatedTo(e);
         }
 
         private void FlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Settings.Values["selectedIndex"] = EbookFlipView.SelectedIndex;
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            Settings = ApplicationData.Current.RoamingSettings.CreateContainer(Ebook.Isbn, ApplicationDataCreateDisposition.Always);
-
-            AsyncContext.Run(async () =>
-            {
-                var pages = await PageStorage.GetPagePathsAsync(Ebook.Isbn);
-
-                var selectedIndex = (int)Settings.Values["selectedIndex"];
-
-                EbookOpenings.Add(new EbookOpeningViewModel(null, pages[0]));
-
-                for (int i = 1; i < pages.Length; i++)
-                {
-                    EbookOpenings.Add(new EbookOpeningViewModel(pages[i], i + 1 == pages.Length ? null : pages[i + 1]));
-                    i++;
-                }
-
-                Settings.Values["selectedIndex"] = EbookFlipView.SelectedIndex = selectedIndex;
-
-                LoadingProgressRing.IsActive = false;
-            });
         }
 
         #region Mouse Panning
@@ -137,7 +145,7 @@ namespace HermodsLarobok.Views
 
         #endregion Mouse Panning
 
-        public static async Task TryShowWindowAsync(Ebook ebook) => await TryShowWindowAsync(new EbookViewModel(ebook));
+        public static async Task<bool> TryShowWindowAsync(HermodsNovoEbook ebook) => await TryShowWindowAsync(new EbookViewModel(ebook));
 
         public static async Task<bool> TryShowWindowAsync(EbookViewModel ebookViewModel)
         {
@@ -150,6 +158,24 @@ namespace HermodsLarobok.Views
             ElementCompositionPreview.SetAppWindowContent(readingWindow, readingWindowContentFrame);
 
             return await readingWindow.TryShowAsync();
+        }
+
+        private void CopyLinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            DataPackage dataPackage = new DataPackage();
+            dataPackage.RequestedOperation = DataPackageOperation.Copy;
+            dataPackage.SetText($"hermodsebook:{Ebook.Isbn}?page={EbookFlipView.SelectedIndex * 2}");
+            Clipboard.SetContent(dataPackage);
+        }
+
+        private void Grid_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            FrameworkElement senderElement = sender as FrameworkElement;
+            // If you need the clicked element:
+            // Item whichOne = senderElement.DataContext as Item;
+            FlyoutBase flyoutBase = FlyoutBase.GetAttachedFlyout(senderElement);
+            //flyoutBase.ShowAt(senderElement);
+            flyoutBase.ShowAt(sender as UIElement, new FlyoutShowOptions() { Position = e.GetPosition(sender as UIElement) });
         }
     }
 }

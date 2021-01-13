@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HermodsLarobok.Models
+namespace HermodsNovo
 {
-    public class Ebook
+    public class HermodsNovoEbook
     {
         /// <summary>
         /// E.g. "Biologi 1 Onlinebok (12 mån)".

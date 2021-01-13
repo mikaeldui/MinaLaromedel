@@ -1,4 +1,4 @@
-﻿using HermodsLarobok.Models;
+﻿using HermodsLarobok.Services;
 using HermodsLarobok.Storage;
 using HermodsLarobok.ViewModels;
 using System;
@@ -28,60 +28,33 @@ namespace HermodsLarobok.Views
     /// </summary>
     public sealed partial class EbooksPage : Page
     {
-        public ObservableCollection<EbookViewModel> Ebooks { get; } = new ObservableCollection<EbookViewModel>();
+        public ObservableCollection<EbookViewModel> Ebooks => EbookService.Ebooks;
 
         public EbooksPage()
         {
             this.InitializeComponent();
         }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            var ebooks = await EbookStorage.GetEbooksAsync();
+            _ = EbookService.LoadEbooksAsync(Dispatcher);
 
-            if (ebooks != null)
-                foreach (var ebook in ebooks)
-                    Ebooks.Add(new EbookViewModel(ebook));
-            else
-            {
-                ebooks = await App.HermodsNovoClient.GetEbooksAsync();
-                foreach (var ebook in ebooks)
-                    Ebooks.Add(new EbookViewModel(ebook));
-
-                await EbookStorage.SaveEbooksAsync(ebooks);
-            }
+            base.OnNavigatedTo(e);
         }
 
-        private async void EbooksListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            if (e.AddedItems.Count == 0) return;
-
-            var selectedBook = e.AddedItems[0] as EbookViewModel;
-
-            await ReadingPage.TryShowWindowAsync(selectedBook);
+            _ = EbookService.RefreshEbooksAsync(Dispatcher);
         }
 
-        private async void AppBarButton_Click(object sender, RoutedEventArgs e)
+        private async void EbooksGrid_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var ebooks = await App.HermodsNovoClient.GetEbooksAsync();
+            var clickedBook = e.ClickedItem as EbookViewModel;
 
-            // remove
-            {
-                var oldEbooks = Ebooks.Where(eb => !ebooks.Select(ebb => ebb.Isbn).Contains(eb.Isbn));
-                foreach (var oldEbook in oldEbooks)
-                    Ebooks.Remove(oldEbook);
-            }
-
-            // Add
-            foreach (var ebook in ebooks)
-            {
-                var existing = Ebooks.FirstOrDefault(eb => eb.Isbn == ebook.Isbn);
-
-                if (existing == null)
-                    Ebooks.Add(new EbookViewModel(ebook));
-            }
-
-            await EbookStorage.SaveEbooksAsync(ebooks);
+            if (clickedBook.IsDownloaded)
+                await ReadingPage.TryShowWindowAsync(clickedBook);
+            else if (clickedBook.IsDownloadable && !clickedBook.IsDownloading && clickedBook.Download.CanExecute(null))
+                clickedBook.Download.Execute(null);
         }
     }
 }
