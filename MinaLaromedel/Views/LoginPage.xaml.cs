@@ -33,29 +33,30 @@ namespace MinaLaromedel.Views
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            ErrorMessageTextBlock.Text = "";
             LoginFormStackPanel.Opacity = 0.5;
             UsernameTextBox.IsEnabled = PasswordBoxControl.IsEnabled = LoginButton.IsEnabled = false;
             LoginProgressRing.IsActive = true;
 
             // Login
-            try
+
+            if (await EbookService.TryAuthenticateAsync(UsernameTextBox.Text, PasswordBoxControl.Password));
             {
-                await EbookService.TryAuthenticateAsync(UsernameTextBox.Text, PasswordBoxControl.Password);
-                {
-                    var settings = ApplicationData.Current.RoamingSettings;
+                var settings = ApplicationData.Current.RoamingSettings;
 
-                    settings.Values["username"] = UsernameTextBox.Text;
-                    settings.Values["password"] = PasswordBoxControl.Password;
+                settings.Values["username"] = UsernameTextBox.Text;
+                settings.Values["password"] = PasswordBoxControl.Password;
 
-                    Frame.Navigate(typeof(MainPage));
-                }
+                Frame.Navigate(typeof(MainPage));
             }
-            catch (HermodsNovoInvalidCredentialsException)
+            else
             {
+                ErrorMessageTextBlock.Text = "Ogiltigt användarnamn eller lösenord.";
                 // On Error
                 UsernameTextBox.IsEnabled = PasswordBoxControl.IsEnabled = LoginButton.IsEnabled = true;
                 LoginProgressRing.IsActive = false;
                 LoginFormStackPanel.Opacity = 1;
+
             }
         }
     }
