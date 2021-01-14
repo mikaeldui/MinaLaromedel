@@ -10,6 +10,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace HermodsLarobok.Storage
 {
+    // TODO: Maybe cache them instead, and absolutely set the correct expiration date.
     public static class PageStorage
     {
         public static async Task SavePageAsync(HermodsNovoEbook ebook, Stream image, int page)

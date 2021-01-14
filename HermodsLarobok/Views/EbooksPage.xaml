@@ -45,7 +45,7 @@
             </GridView.ItemTemplate>
         </GridView>
         <CommandBar Background="Transparent" IsOpen="False" DefaultLabelPosition="Right" VerticalAlignment="Bottom">
-            <AppBarButton Icon="Refresh" Label="Refresh" Click="AppBarButton_Click"/>
+            <AppBarButton Icon="Refresh" Label="Uppdatera" Click="AppBarButton_Click"/>
         </CommandBar>
 
     </Grid>

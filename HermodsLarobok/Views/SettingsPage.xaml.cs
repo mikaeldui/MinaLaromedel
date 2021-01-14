@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -25,6 +26,16 @@ namespace HermodsLarobok.Views
         public SettingsPage()
         {
             this.InitializeComponent();
+        }
+
+        private async void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            //await ApplicationData.Current.LocalFolder.DeleteAsync();
+            //ApplicationData.Current.LocalSettings.Values.Clear();
+
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            rootFrame.Navigate(typeof(LoginPage), null);
         }
     }
 }

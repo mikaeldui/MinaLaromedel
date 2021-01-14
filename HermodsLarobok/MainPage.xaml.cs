@@ -53,7 +53,7 @@ namespace HermodsLarobok
         // List of ValueTuple holding the Navigation Tag and the relative Navigation Page
         private readonly List<(string Tag, Type Page)> _pages = new List<(string Tag, Type Page)>
         {
-            ("home", typeof(HomePage)),
+            //("home", typeof(HomePage)),
             ("ebooks", typeof(EbooksPage)),
             //("search", typeof(SearchPage))
         };
@@ -83,6 +83,9 @@ namespace HermodsLarobok
             };
             altLeft.Invoked += BackInvoked;
             this.KeyboardAccelerators.Add(altLeft);
+
+            var settings = (NavigationViewItem)NavView.SettingsItem;
+            settings.Content = "Inställningar";
         }
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

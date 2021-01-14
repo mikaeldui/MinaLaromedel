@@ -30,22 +30,22 @@
     <NavigationView x:Name="NavView" Loaded="NavView_Loaded" ItemInvoked="NavView_ItemInvoked" 
                     BackRequested="NavView_BackRequested">
         <NavigationView.MenuItems>
-            <NavigationViewItem Tag="home" Content="Hem">
+            <!--<NavigationViewItem Tag="home" Content="Hem">
                 <NavigationViewItem.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF404;"/>
                 </NavigationViewItem.Icon>
-            </NavigationViewItem>
+            </NavigationViewItem>-->
             <NavigationViewItem Tag="ebooks" Content="Mina läromedel">
                 <NavigationViewItem.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8F1;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
         </NavigationView.MenuItems>
-        <NavigationView.AutoSuggestBox>
-            <!--See AutoSuggestBox documentation for
-                 more info about how to implement search.-->
+        <!--<NavigationView.AutoSuggestBox>
+            --><!--See AutoSuggestBox documentation for
+                 more info about how to implement search.--><!--
             <AutoSuggestBox x:Name="NavViewSearchBox" QueryIcon="Find"/>
-        </NavigationView.AutoSuggestBox>
+        </NavigationView.AutoSuggestBox>-->
 
         <Frame x:Name="ContentFrame" Padding="12,0,12,24" IsTabStop="True"
                    NavigationFailed="ContentFrame_NavigationFailed"/>

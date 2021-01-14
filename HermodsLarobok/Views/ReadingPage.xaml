@@ -26,7 +26,7 @@
                         <Grid Width="{Binding Path=ViewportWidth, ElementName=ScrollViewerMain}" RightTapped="Grid_RightTapped">
                             <FlyoutBase.AttachedFlyout>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk" Icon="Link" Click="CopyLinkButton_Click"/>
+                                    <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk till sidan" Icon="Link" Click="CopyLinkButton_Click"/>
                                 </MenuFlyout>
                             </FlyoutBase.AttachedFlyout>
                             <Grid.ColumnDefinitions>
