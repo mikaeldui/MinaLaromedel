@@ -40,7 +40,7 @@ namespace MinaLaromedel.Views
 
             // Login
 
-            if (await EbookService.TryAuthenticateAsync(UsernameTextBox.Text, PasswordBoxControl.Password));
+            if (await EbookService.TryAuthenticateAsync(UsernameTextBox.Text, PasswordBoxControl.Password))
             {
                 var settings = ApplicationData.Current.RoamingSettings;
 
