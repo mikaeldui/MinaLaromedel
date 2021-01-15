@@ -9,7 +9,13 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid x:Name="MainGrid">
-        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}">
+        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}" RightTapped="EbookFlipView_RightTapped">
+            <FlyoutBase.AttachedFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk till sidan" Icon="Link" Click="CopyLinkButton_Click"/>
+                    <MenuFlyoutItem x:Name="FullScreenButton" Text="Helskärmsläge" Icon="FullScreen" Click="FullScreenButton_Click"/>
+                </MenuFlyout>
+            </FlyoutBase.AttachedFlyout>
             <FlipView.ItemTemplate>
                 <DataTemplate>
                     <ScrollViewer 
@@ -23,12 +29,7 @@
                         PointerPressed="MainScrollviewer_PointerPressed"
                         PointerMoved="MainScrollviewer_PointerMoved"
                         PointerReleased="MainScrollviewer_PointerReleased">
-                        <Grid Width="{Binding Path=ViewportWidth, ElementName=ScrollViewerMain}" RightTapped="Grid_RightTapped">
-                            <FlyoutBase.AttachedFlyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk till sidan" Icon="Link" Click="CopyLinkButton_Click"/>
-                                </MenuFlyout>
-                            </FlyoutBase.AttachedFlyout>
+                        <Grid Width="{Binding Path=ViewportWidth, ElementName=ScrollViewerMain}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition />

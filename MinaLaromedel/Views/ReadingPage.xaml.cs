@@ -27,6 +27,7 @@ using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -41,6 +42,8 @@ namespace MinaLaromedel.Views
         public double PageMaxWidth { get; set; }
 
         public EbookViewModel Ebook { get; set; }
+
+        public AppWindow AppWindow => App.ReadingWindows[Ebook];
 
         public ApplicationDataContainer Settings { get; set; }
 
@@ -155,6 +158,7 @@ namespace MinaLaromedel.Views
                 return await App.ReadingWindows[ebookViewModel].TryShowAsync();            
 
             AppWindow readingWindow = await AppWindow.TryCreateAsync();
+            App.ReadingWindows.Add(ebookViewModel, readingWindow);
             readingWindow.Title = ebookViewModel.Title;
 
             readingWindow.Closed += (sender, e) =>
@@ -167,7 +171,6 @@ namespace MinaLaromedel.Views
 
             ElementCompositionPreview.SetAppWindowContent(readingWindow, readingWindowContentFrame);
 
-            App.ReadingWindows.Add(ebookViewModel, readingWindow);
 
             return await readingWindow.TryShowAsync();
         }
@@ -180,7 +183,7 @@ namespace MinaLaromedel.Views
             Clipboard.SetContent(dataPackage);
         }
 
-        private void Grid_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        private void EbookFlipView_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             FrameworkElement senderElement = sender as FrameworkElement;
             // If you need the clicked element:
@@ -188,6 +191,48 @@ namespace MinaLaromedel.Views
             FlyoutBase flyoutBase = FlyoutBase.GetAttachedFlyout(senderElement);
             //flyoutBase.ShowAt(senderElement);
             flyoutBase.ShowAt(sender as UIElement, new FlyoutShowOptions() { Position = e.GetPosition(sender as UIElement) });
+        }
+
+        private void FullScreenButton_Click(object sender, RoutedEventArgs e)
+        {
+            var configuration = AppWindow.Presenter.GetConfiguration();
+            if (configuration.Kind == AppWindowPresentationKind.FullScreen && AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.Default))
+            {
+                FullScreenButton.Text = "Helskärmsläge";
+                FullScreenButton.Icon = new SymbolIcon(Symbol.FullScreen);
+
+                AppWindow.Changed -= AppWindow_Changed;
+            }
+            else
+            {
+                if (AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.FullScreen))
+                {
+                    FullScreenButton.Text = "Avsluta helskärmsläge";
+                    FullScreenButton.Icon = new SymbolIcon(Symbol.BackToWindow);
+
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(500);
+                        await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        {
+                            AppWindow.Changed += AppWindow_Changed;
+                        });
+                    });
+                }
+            }
+        }
+
+        private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
+        {
+            if (args.DidSizeChange)
+            {
+                AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.Default);
+
+                FullScreenButton.Text = "Helskärmsläge";
+                FullScreenButton.Icon = new SymbolIcon(Symbol.FullScreen);
+
+                AppWindow.Changed -= AppWindow_Changed;
+            }
         }
     }
 }
