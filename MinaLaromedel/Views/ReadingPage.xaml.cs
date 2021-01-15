@@ -196,7 +196,7 @@ namespace MinaLaromedel.Views
         private void FullScreenButton_Click(object sender, RoutedEventArgs e)
         {
             var configuration = AppWindow.Presenter.GetConfiguration();
-            if (configuration.Kind == AppWindowPresentationKind.FullScreen && AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.Default))
+            if (FullScreenButton.Text == "Avsluta helskärmsläge" && AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.Default))
             {
                 FullScreenButton.Text = "Helskärmsläge";
                 FullScreenButton.Icon = new SymbolIcon(Symbol.FullScreen);
