@@ -37,12 +37,31 @@ namespace MinaLaromedel.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            _ = EbookService.LoadEbooksAsync(Dispatcher);
+            _ = EbookService.LoadEbooksAsync(Dispatcher)
+                            .ContinueWith(async _ => 
+                            { 
+                                if (EbookService.Ebooks.Count == 0)
+                                {
+                                    try
+                                    {
+                                        await EbookService.RefreshEbooksAsync(Dispatcher);
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                }
+
+                                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                                {
+                                    RefreshButton.IsEnabled = true;
+                                });
+                            });
 
             base.OnNavigatedTo(e);
         }
 
-        private void AppBarButton_Click(object sender, RoutedEventArgs e)
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             _ = EbookService.RefreshEbooksAsync(Dispatcher);
         }
