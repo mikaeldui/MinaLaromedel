@@ -12,6 +12,7 @@ using Windows.Networking.Connectivity;
 using Windows.UI.StartScreen;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Input.Inking;
 
 namespace MinaLaromedel.ViewModels
 {
@@ -67,7 +68,6 @@ namespace MinaLaromedel.ViewModels
             _ = _asyncInit();            
         }
 
-
         private async Task _asyncInit()
         {
             if (!await PageStorage.EbookExistsAsync(_ebook))
@@ -91,6 +91,8 @@ namespace MinaLaromedel.ViewModels
         public string Title => _ebook.Title;
 
         public string Isbn => _ebook.Isbn;
+
+        #region Download
 
         public bool IsDownloaded
         {
@@ -131,6 +133,12 @@ namespace MinaLaromedel.ViewModels
             }
         }
 
+        public ICommand Download { get; }
+
+        #endregion Download
+
+        #region Pin
+
         public bool IsPinnable
         {
             get => _isPinnable;
@@ -144,6 +152,10 @@ namespace MinaLaromedel.ViewModels
             }
         }
 
+        public ICommand Pin { get; }
+
+        #endregion Pin
+
         public string FrontPagePath
         {
             get => _frontPagePath;
@@ -156,9 +168,5 @@ namespace MinaLaromedel.ViewModels
                 }
             }
         }
-
-        public ICommand Download { get; }
-
-        public ICommand Pin { get; }
     }
 }

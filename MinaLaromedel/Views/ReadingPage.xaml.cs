@@ -52,6 +52,21 @@ namespace MinaLaromedel.Views
         public ReadingPage()
         {
             this.InitializeComponent();
+
+//#if DEBUG
+//            // PIP testing.
+//            var menuFlyout = EbookFlipView.ContextFlyout as MenuFlyout;
+
+//            var pipItem = new MenuFlyoutItem()
+//            {
+//                Text = "PIP",
+//                Icon = new SymbolIcon(Symbol.FullScreen)
+//            };
+
+//            pipItem.Click += (_, _2) => AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.CompactOverlay);
+
+//            menuFlyout.Items.Add(pipItem);
+//#endif
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -77,15 +92,21 @@ namespace MinaLaromedel.Views
             {
                 var pages = await PageStorage.GetPagePathsAsync(Ebook.Isbn);
 
+                List<EbookOpeningViewModel> viewModels = new List<EbookOpeningViewModel>();
+
+                // Add the front page
+                viewModels.Add(new EbookOpeningViewModel(null, pages[0]));
+
+                for (int i = 1; i < pages.Length; i++)
+                {
+                    viewModels.Add(new EbookOpeningViewModel(pages[i], i + 1 == pages.Length ? null : pages[i + 1]));
+                    i++;
+                }
+
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    EbookOpenings.Add(new EbookOpeningViewModel(null, pages[0]));
-
-                    for (int i = 1; i < pages.Length; i++)
-                    {
-                        EbookOpenings.Add(new EbookOpeningViewModel(pages[i], i + 1 == pages.Length ? null : pages[i + 1]));
-                        i++;
-                    }
+                    foreach (var vm in viewModels)
+                        EbookOpenings.Add(vm);
 
                     if (Settings.Values.ContainsKey("selectedIndex"))
                         EbookFlipView.SelectedIndex = (int)Settings.Values["selectedIndex"];
@@ -104,84 +125,7 @@ namespace MinaLaromedel.Views
             Settings.Values["selectedIndex"] = EbookFlipView.SelectedIndex;
         }
 
-        #region Mouse Panning
-
-        Pointer pointer;
-        PointerPoint scrollMousePoint;
-        double hOff = 1;
-        double vOff = 1;
-
-        private void MainScrollviewer_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            var scrollViewer = sender as ScrollViewer;
-            pointer = e.Pointer;
-            scrollMousePoint = e.GetCurrentPoint(scrollViewer);
-            hOff = scrollViewer.HorizontalOffset;
-            vOff = scrollViewer.VerticalOffset;
-            scrollViewer.CapturePointer(pointer);
-        }
-
-        private void MainScrollviewer_PointerReleased(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            
-            var scrollViewer = sender as ScrollViewer;
-            scrollViewer.ReleasePointerCaptures();
-        }
-
-        private void MainScrollviewer_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            var scrollViewer = sender as ScrollViewer;
-            if (scrollViewer.PointerCaptures != null && scrollViewer.PointerCaptures.Count > 0)
-            {
-                scrollViewer.ChangeView(hOff + (scrollMousePoint.Position.X - e.GetCurrentPoint(scrollViewer).Position.X),
-                                        vOff + (scrollMousePoint.Position.Y - e.GetCurrentPoint(scrollViewer).Position.Y), null);
-            }
-        }
-
-        private void ScrollViewerMain_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 0);
-        }
-
-        private void ScrollViewerMain_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 0);
-        }
-
-        #endregion Mouse Panning
-
-        public static async Task<bool> TryShowWindowAsync(HermodsNovoEbook ebook) => await TryShowWindowAsync(new EbookViewModel(ebook));
-
-        public static async Task<bool> TryShowWindowAsync(EbookViewModel ebookViewModel)
-        {
-            if (App.ReadingWindows.ContainsKey(ebookViewModel))
-                return await App.ReadingWindows[ebookViewModel].TryShowAsync();            
-
-            AppWindow readingWindow = await AppWindow.TryCreateAsync();
-            App.ReadingWindows.Add(ebookViewModel, readingWindow);
-            readingWindow.Title = ebookViewModel.Title;
-
-            readingWindow.Closed += (sender, e) =>
-            {
-                App.ReadingWindows.Remove(App.ReadingWindows.First(_ => _.Value == sender).Key);
-            };
-
-            Frame readingWindowContentFrame = new Frame();
-            readingWindowContentFrame.Navigate(typeof(ReadingPage), ebookViewModel);
-
-            ElementCompositionPreview.SetAppWindowContent(readingWindow, readingWindowContentFrame);
-
-
-            return await readingWindow.TryShowAsync();
-        }
-
-        private void CopyLinkButton_Click(object sender, RoutedEventArgs e)
-        {
-            DataPackage dataPackage = new DataPackage();
-            dataPackage.RequestedOperation = DataPackageOperation.Copy;
-            dataPackage.SetText($"mina-laromedel:{Ebook.Isbn}?page={EbookFlipView.SelectedIndex * 2}");
-            Clipboard.SetContent(dataPackage);
-        }
+        #region Context Menu
 
         private void EbookFlipView_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
@@ -193,15 +137,32 @@ namespace MinaLaromedel.Views
             flyoutBase.ShowAt(sender as UIElement, new FlyoutShowOptions() { Position = e.GetPosition(sender as UIElement) });
         }
 
+        private void EbookFlipView_Holding(object sender, HoldingRoutedEventArgs e)
+        {
+            FrameworkElement senderElement = sender as FrameworkElement;
+            // If you need the clicked element:
+            // Item whichOne = senderElement.DataContext as Item;
+            FlyoutBase flyoutBase = FlyoutBase.GetAttachedFlyout(senderElement);
+            //flyoutBase.ShowAt(senderElement);
+            flyoutBase.ShowAt(sender as UIElement, new FlyoutShowOptions() { Position = e.GetPosition(sender as UIElement) });
+        }
+
+        private void CopyLinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            DataPackage dataPackage = new DataPackage();
+            dataPackage.RequestedOperation = DataPackageOperation.Copy;
+            dataPackage.SetText($"mina-laromedel:{Ebook.Isbn}?page={EbookFlipView.SelectedIndex * 2}");
+            Clipboard.SetContent(dataPackage);
+        }
+
+        #region Full Screen
+
         private void FullScreenButton_Click(object sender, RoutedEventArgs e)
         {
             var configuration = AppWindow.Presenter.GetConfiguration();
-            if (FullScreenButton.Text == "Avsluta helskärmsläge" && AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.Default))
+            if (FullScreenButton.Text == "Avsluta helskärmsläge" && _tryExitFullScreen())
             {
-                FullScreenButton.Text = "Helskärmsläge";
-                FullScreenButton.Icon = new SymbolIcon(Symbol.FullScreen);
-
-                AppWindow.Changed -= AppWindow_Changed;
+                // Nothing
             }
             else
             {
@@ -226,13 +187,65 @@ namespace MinaLaromedel.Views
         {
             if (args.DidSizeChange)
             {
-                AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.Default);
-
-                FullScreenButton.Text = "Helskärmsläge";
-                FullScreenButton.Icon = new SymbolIcon(Symbol.FullScreen);
-
-                AppWindow.Changed -= AppWindow_Changed;
+                _tryExitFullScreen();
             }
         }
+
+        private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Escape)
+            {
+                _tryExitFullScreen();
+            }
+        }
+
+        private bool _tryExitFullScreen()
+        {
+            if (AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.Default))
+            {
+                FullScreenButton.Text = "Helskärmsläge";
+                FullScreenButton.Icon = new SymbolIcon(Symbol.FullScreen);
+                AppWindow.Changed -= AppWindow_Changed;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        #endregion Full Screen
+
+        #endregion Context Menu
+
+        #region TryShowWindowAsync
+
+        public static async Task<bool> TryShowWindowAsync(HermodsNovoEbook ebook) => await TryShowWindowAsync(new EbookViewModel(ebook));
+
+        public static async Task<bool> TryShowWindowAsync(EbookViewModel ebookViewModel)
+        {
+            if (App.ReadingWindows.ContainsKey(ebookViewModel))
+                return await App.ReadingWindows[ebookViewModel].TryShowAsync();
+
+            AppWindow readingWindow = await AppWindow.TryCreateAsync();
+            App.ReadingWindows.Add(ebookViewModel, readingWindow);
+            readingWindow.Title = ebookViewModel.Title;
+
+            readingWindow.Closed += (sender, e) =>
+            {
+                App.ReadingWindows.Remove(App.ReadingWindows.First(_ => _.Value == sender).Key);
+            };
+
+            Frame readingWindowContentFrame = new Frame();
+            readingWindowContentFrame.Navigate(typeof(ReadingPage), ebookViewModel);
+
+            ElementCompositionPreview.SetAppWindowContent(readingWindow, readingWindowContentFrame);
+
+
+            return await readingWindow.TryShowAsync();
+        }
+
+        #endregion TryShowWindowAsync
+
+
     }
 }

@@ -16,26 +16,16 @@
                     <Setter Property="Margin" Value="5, 5, 5, 5"/>
                 </Style>
             </GridView.ItemContainerStyle>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid x:Name="MaxItemsWrapGrid"
-                           MaximumRowsOrColumns="3"
-                           Orientation="Horizontal"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
             <GridView.ItemTemplate>
                 <DataTemplate x:Name="ImageOverlayTemplate">
                     <Grid Width="200" Height="300">
+                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" HorizontalAlignment="Center" />
                         <Image Stretch="UniformToFill">
                             <Image.Source>
                                 <BitmapImage UriSource="{Binding FrontPagePath}"/>
                             </Image.Source>
                         </Image>
-
-                        <StackPanel Orientation="Vertical" Height="40" VerticalAlignment="Bottom" Padding="5,1,45,1" Background="LightGray" Opacity=".75">
-                            <TextBlock Text="{Binding Title}"/>
-                        </StackPanel>
-                        <CommandBar Background="Transparent" IsOpen="False" DefaultLabelPosition="Right" VerticalAlignment="Bottom">
+                        <CommandBar Background="{ThemeResource SystemControlAcrylicElementBrush}" IsOpen="False" DefaultLabelPosition="Right" VerticalAlignment="Bottom">
                             <AppBarButton Icon="Pin" Label="Fäst" Command="{Binding Pin}" IsEnabled="{Binding IsDownloaded}" />
                             <AppBarButton Icon="Download" Label="Ladda ner" Command="{Binding Download}" IsEnabled="{Binding IsDownloadable}" />
                         </CommandBar>

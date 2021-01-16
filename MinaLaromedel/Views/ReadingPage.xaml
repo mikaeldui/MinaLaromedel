@@ -5,52 +5,41 @@
     xmlns:local="using:MinaLaromedel.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:MinaLaromedel.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    RequestedTheme="Dark" KeyDown="Page_KeyDown">
 
     <Grid x:Name="MainGrid">
-        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}" RightTapped="EbookFlipView_RightTapped">
+        <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}" RightTapped="EbookFlipView_RightTapped" Background="Black" Holding="EbookFlipView_Holding">
             <FlyoutBase.AttachedFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk till sidan" Icon="Link" Click="CopyLinkButton_Click"/>
-                    <MenuFlyoutItem x:Name="FullScreenButton" Text="Helskärmsläge" Icon="FullScreen" Click="FullScreenButton_Click"/>
+                    <!--<MenuFlyoutItem x:Name="ReadAloudButton" Text="Läs upp" Click="ReadAloudButton_Click">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEFA9;"/>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>-->
+                    <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk till sidan" Icon="Link" Click="CopyLinkButton_Click" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem x:Name="FullScreenButton" Text="Helskärmsläge" Icon="FullScreen" Click="FullScreenButton_Click" />
                 </MenuFlyout>
             </FlyoutBase.AttachedFlyout>
+            <FlipView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal" VirtualizationMode="Standard" />
+                </ItemsPanelTemplate>
+            </FlipView.ItemsPanel>
             <FlipView.ItemTemplate>
                 <DataTemplate>
-                    <ScrollViewer 
-                        Name="ScrollViewerMain"
-                        HorizontalScrollBarVisibility="Auto"
-                        VerticalScrollBarVisibility="Auto"                        
-                        MinZoomFactor="1" 
-                        ZoomMode="Enabled"
-                        PointerEntered="ScrollViewerMain_PointerEntered"
-                        PointerExited="ScrollViewerMain_PointerExited"
-                        PointerPressed="MainScrollviewer_PointerPressed"
-                        PointerMoved="MainScrollviewer_PointerMoved"
-                        PointerReleased="MainScrollviewer_PointerReleased">
-                        <Grid Width="{Binding Path=ViewportWidth, ElementName=ScrollViewerMain}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Image x:Name="LeftImage" Stretch="Uniform" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   MaxHeight="{Binding Path=ViewportHeight, ElementName=ScrollViewerMain}">
-                                <Image.Source>
-                                    <BitmapImage UriSource="{Binding LeftPagePath}"/>
-                                </Image.Source>
-                            </Image>
-                            <Image x:Name="RightImage" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1"
-                                   MaxHeight="{Binding Path=ViewportHeight, ElementName=ScrollViewerMain}">
-                                <Image.Source>
-                                    <BitmapImage UriSource="{Binding RightPagePath}"/>
-                                </Image.Source>
-                            </Image>
-                        </Grid>                        
-                    </ScrollViewer>                    
+                    <controls:PageOpening>
+                        <controls:PageOpening.LeftImageSource>
+                            <BitmapImage UriSource="{Binding LeftPagePath}"/>
+                        </controls:PageOpening.LeftImageSource>
+                        <controls:PageOpening.RightImageSource>
+                            <BitmapImage UriSource="{Binding RightPagePath}"/>
+                        </controls:PageOpening.RightImageSource>
+                    </controls:PageOpening>
                 </DataTemplate>
             </FlipView.ItemTemplate>
-            
         </FlipView>
         <ProgressRing x:Name="LoadingProgressRing" Height="100" Width="100" IsActive="True" />
     </Grid>

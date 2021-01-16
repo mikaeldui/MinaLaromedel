@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MinaLaromedel.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,6 +28,8 @@ namespace MinaLaromedel.Views
         {
             this.InitializeComponent();
         }
+
+        public string Username => SettingsService.Username;
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {

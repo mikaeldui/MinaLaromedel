@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Input.Inking;
 using Windows.UI.Xaml.Media;
 
 namespace MinaLaromedel.ViewModels
@@ -24,8 +25,11 @@ namespace MinaLaromedel.ViewModels
             get { return _leftPagePath; }
             set
             {
-                _leftPagePath = value;
-                RaisePropertyChanged();
+                if (_leftPagePath != value)
+                {
+                    _leftPagePath = value;
+                    RaisePropertyChanged();
+                }
             }
         }
 
@@ -34,8 +38,11 @@ namespace MinaLaromedel.ViewModels
             get { return _rightPagePath; }
             set
             {
-                _rightPagePath = value;
-                RaisePropertyChanged();
+                if (_rightPagePath != value)
+                {
+                    _rightPagePath = value;
+                    RaisePropertyChanged();
+                }
             }
         }
     }
