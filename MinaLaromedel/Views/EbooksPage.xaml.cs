@@ -61,9 +61,17 @@ namespace MinaLaromedel.Views
             base.OnNavigatedTo(e);
         }
 
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            _ = EbookService.RefreshEbooksAsync(Dispatcher);
+            RefreshButton.IsEnabled = false;
+            try
+            {
+                await EbookService.RefreshEbooksAsync(Dispatcher);
+            }
+            finally
+            {
+                RefreshButton.IsEnabled = true;
+            }
         }
 
         private async void EbooksGrid_ItemClick(object sender, ItemClickEventArgs e)

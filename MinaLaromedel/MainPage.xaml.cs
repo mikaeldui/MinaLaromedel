@@ -60,6 +60,8 @@ namespace MinaLaromedel
 
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
+            NavView.IsPaneOpen = false;
+
             // Add handler for ContentFrame navigation.
             ContentFrame.Navigated += On_Navigated;
 

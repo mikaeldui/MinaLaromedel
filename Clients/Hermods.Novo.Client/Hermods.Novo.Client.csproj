@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Hermods.Novo</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.30" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Liber.Onlinebok.Client\Liber.Onlinebok.Client.csproj" />
+  </ItemGroup>
+
+</Project>

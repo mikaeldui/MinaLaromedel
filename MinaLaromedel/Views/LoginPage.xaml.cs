@@ -1,5 +1,5 @@
 ﻿using MinaLaromedel.Services;
-using HermodsNovo;
+using Hermods.Novo;
 using System;
 using System.Collections.Generic;
 using System.IO;

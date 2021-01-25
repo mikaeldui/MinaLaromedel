@@ -28,7 +28,7 @@
     </VisualStateManager.VisualStateGroups>
 
     <NavigationView x:Name="NavView" Loaded="NavView_Loaded" ItemInvoked="NavView_ItemInvoked"
-                    BackRequested="NavView_BackRequested" IsPaneOpen="False">
+                    BackRequested="NavView_BackRequested">
         <NavigationView.MenuItems>
             <!--<NavigationViewItem Tag="home" Content="Hem">
                 <NavigationViewItem.Icon>

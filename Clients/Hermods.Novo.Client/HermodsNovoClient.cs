@@ -1,4 +1,4 @@
-﻿using LiberOnlinebok;
+﻿using Liber.Onlinebok;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,23 +7,30 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Storage;
 
-namespace HermodsNovo
+namespace Hermods.Novo
 {
-    public class HermodsNovoClient
+    public class HermodsNovoClient : IDisposable
     {
-        private HttpClient _httpClient;
-        private string _username;
-        private string _password;
+        private readonly HttpClient _httpClient;
+        private readonly HttpClientHandler _httpClientHandler;
+        private readonly CookieContainer _cookieContainer;
 
         public HermodsNovoClient()
         {
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.AllowAutoRedirect = true;
-            _httpClient = new HttpClient(handler);
+            _cookieContainer = new CookieContainer();
+            _httpClientHandler = new HttpClientHandler 
+            { 
+                AllowAutoRedirect = true,
+                CookieContainer = _cookieContainer, 
+                UseCookies = true 
+            };
+            _httpClient = new HttpClient(_httpClientHandler);
         }
 
+        /// <summary>
+        /// Throws <see cref="HermodsNovoInvalidCredentialsException"/> if the credentials are invalid.
+        /// </summary>
         public async Task AuthenticateAsync(string username, string password)
         {
             var message = $"username={username}&password={password}";
@@ -34,12 +41,7 @@ namespace HermodsNovo
 
             if (!response.IsSuccessStatusCode || "https://novo.hermods.se/theme/frigg/layout/views/student/" != response.RequestMessage.RequestUri.ToString())
                 throw new HermodsNovoInvalidCredentialsException("The credentials are not valid."); // TODO: returning bool is probably better.
-
-            _username = username;
-            _password = password;            
         }
-
-        private async Task _reauthenticateAsync() => await AuthenticateAsync(_username, _password);
 
         public async Task<HermodsNovoEbook[]> GetEbooksAsync()
         {
@@ -50,17 +52,19 @@ namespace HermodsNovo
             return await HermodsNovoHelper.ParseEbooksAsync(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task<LiberOnlinebokEbook> GetLiberOnlinebokEbookAsync(HermodsNovoEbook ebook)
+        public async Task<LiberOnlinebokClient> GetLiberOnlinebokClientAsync(HermodsNovoEbook ebook)
         {
+            if (ebook.Publisher != "Liber")
+                throw new ArgumentException("The e-book is not published by Liber.");
+
             var response = await _httpClient.GetAsync(ebook.Url);
 
             _ensureSuccess(response);
 
-            var uri = response.RequestMessage.RequestUri.ToString();
+            if (response.RequestMessage.RequestUri.ToString().StartsWith("https://novo.hermods.se/ham/linkresolver.php"))
+                throw new ApplicationException("Redirection didn't work");
 
-            var guid = Regex.Match(uri, "([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})").Value;
-
-            return new LiberOnlinebokEbook(Guid.Parse(guid));
+            return LiberOnlinebokClient.From(response.RequestMessage.RequestUri, _cookieContainer);
         }
 
         private bool _ensureSuccess(HttpResponseMessage response)
@@ -72,5 +76,7 @@ namespace HermodsNovo
 
             return true;
         }
+
+        public void Dispose() => _httpClient.Dispose();
     }
 }

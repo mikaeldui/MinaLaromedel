@@ -8,10 +8,10 @@
 
   <Identity
     Name="63348Swebias.Minalromedel"
-    Publisher="CN=Temp"
-    Version="1.0.0.0" />
+    Publisher="CN=731C04CF-6B3E-4849-9E07-A8FD19D79A09"
+    Version="1.0.4.0" />
 
-  <mp:PhoneIdentity PhoneProductId="11801ed5-3fb5-4d51-9491-d0dcbdd1f36d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="956d4147-53ab-42e8-9ebe-1e62a4744e6d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Mina läromedel</DisplayName>

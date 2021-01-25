@@ -1,7 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using MinaLaromedel.Services;
 using MinaLaromedel.Storage;
-using HermodsNovo;
+using Hermods.Novo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,9 @@ using Windows.UI.StartScreen;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Input.Inking;
+using GalaSoft.MvvmLight.Messaging;
+using MinaLaromedel.Messages;
+using MinaLaromedel.Tiles;
 
 namespace MinaLaromedel.ViewModels
 {
@@ -24,6 +27,7 @@ namespace MinaLaromedel.ViewModels
         private bool _isDownloadable = false;
         private string _frontPagePath;
         private bool _isPinnable = false;
+        private string _downloadStatus;
 
         public EbookViewModel(HermodsNovoEbook ebook) 
         {
@@ -34,35 +38,23 @@ namespace MinaLaromedel.ViewModels
                 IsDownloadable = false;
                 IsDownloading = true;
 
+                Messenger.Default.Register<DownloadStatusMessage>(this, _ebook.Isbn, msg =>
+                {
+                    DownloadStatus = $"{msg.Done} av {msg.Total} sidor nerladdade";
+                });
+
                 await EbookService.DownloadEbookAsync(_ebook);
 
                 IsDownloading = false;
                 IsDownloaded = true;
+                IsPinnable = true;
 
                 FrontPagePath = await PageStorage.GetPagePathAsync(_ebook, 1);
             });
 
             Pin = new RelayCommand(async () =>
             {
-                // Provide all the required info in arguments so that when user
-                // clicks your tile, you can navigate them to the correct content
-                string arguments = "action=viewEbook&isbn=" + _ebook.Isbn;
-
-                var uri = new Uri(await PageStorage.GetThumbnailPathAsync(ebook));
-
-                // Initialize the tile with required arguments
-                SecondaryTile tile = new SecondaryTile(
-                    "isbn-" + _ebook.Isbn,
-                    _ebook.Title,
-                    arguments,
-                    uri,
-                    TileSize.Default);
-
-                if(await tile.RequestCreateAsync())
-                {
-                    IsPinnable = false;
-                }
-
+                IsPinnable = !(await EbookTile.RequestCreateAsync(_ebook));
             });
 
             _ = _asyncInit();            
@@ -78,14 +70,14 @@ namespace MinaLaromedel.ViewModels
             else
             {
                 IsDownloaded = true;
+                IsPinnable = await Task.Run(() => !EbookTile.Exists(_ebook.Isbn));
+
                 try
                 {
                     FrontPagePath = await PageStorage.GetPagePathAsync(_ebook, 1);
                 }
                 catch { }
             }
-
-            IsPinnable = !SecondaryTile.Exists("isbn-" + _ebook.Isbn);
         }
 
         public string Title => _ebook.Title;
@@ -128,6 +120,19 @@ namespace MinaLaromedel.ViewModels
                 if (_isDownloadable != value)
                 {
                     _isDownloadable = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public string DownloadStatus
+        {
+            get => _downloadStatus;
+            set
+            {
+                if (_downloadStatus != value)
+                {
+                    _downloadStatus = value;
                     RaisePropertyChanged();
                 }
             }

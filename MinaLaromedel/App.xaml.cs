@@ -4,7 +4,7 @@ using MinaLaromedel.Services;
 using MinaLaromedel.Storage;
 using MinaLaromedel.ViewModels;
 using MinaLaromedel.Views;
-using HermodsNovo;
+using Hermods.Novo;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
