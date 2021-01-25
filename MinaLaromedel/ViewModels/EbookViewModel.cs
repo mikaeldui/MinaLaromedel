@@ -16,6 +16,7 @@ using Windows.UI.Input.Inking;
 using GalaSoft.MvvmLight.Messaging;
 using MinaLaromedel.Messages;
 using MinaLaromedel.Tiles;
+using Windows.Storage;
 
 namespace MinaLaromedel.ViewModels
 {
@@ -32,6 +33,8 @@ namespace MinaLaromedel.ViewModels
         public EbookViewModel(HermodsNovoEbook ebook) 
         {
             _ebook = ebook;
+            Title = ebook.Title;
+            Isbn = ebook.Isbn;
 
             Download = new RelayCommand(async () =>
             {
@@ -47,9 +50,11 @@ namespace MinaLaromedel.ViewModels
 
                 IsDownloading = false;
                 IsDownloaded = true;
-                IsPinnable = true;
+                IsPinnable = await Task.Run(() => !EbookTile.Exists(_ebook.Isbn));
 
                 FrontPagePath = await PageStorage.GetPagePathAsync(_ebook, 1);
+
+                _ = _watchForDirectoryRemoval();
             });
 
             Pin = new RelayCommand(async () =>
@@ -57,32 +62,33 @@ namespace MinaLaromedel.ViewModels
                 IsPinnable = !(await EbookTile.RequestCreateAsync(_ebook));
             });
 
-            _ = _asyncInit();            
-        }
-
-        private async Task _asyncInit()
-        {
-            if (!await PageStorage.EbookExistsAsync(_ebook))
+            _ = Task.Run(async () =>
             {
-                if (NetworkInformation.GetInternetConnectionProfile() != null)
-                    IsDownloadable = true;
-            }
-            else
-            {
-                IsDownloaded = true;
-                IsPinnable = await Task.Run(() => !EbookTile.Exists(_ebook.Isbn));
-
-                try
+                if (!await PageStorage.EbookExistsAsync(_ebook))
                 {
-                    FrontPagePath = await PageStorage.GetPagePathAsync(_ebook, 1);
+                    if (NetworkInformation.GetInternetConnectionProfile() != null)
+                        IsDownloadable = true;
                 }
-                catch { }
-            }
+                else
+                {
+                    IsDownloaded = true;
+                    IsPinnable = await Task.Run(() => !EbookTile.Exists(_ebook.Isbn));
+
+                    try
+                    {
+                        FrontPagePath = await PageStorage.GetPagePathAsync(_ebook, 1);
+                    }
+                    catch { }
+
+                    _ = _watchForDirectoryRemoval();
+                }
+
+            });
         }
 
-        public string Title => _ebook.Title;
+        public string Title { get; }
 
-        public string Isbn => _ebook.Isbn;
+        public string Isbn { get; }
 
         #region Download
 
@@ -170,6 +176,29 @@ namespace MinaLaromedel.ViewModels
                 {
                     _frontPagePath = value;
                     RaisePropertyChanged();
+                }
+            }
+        }
+
+        private async Task _watchForDirectoryRemoval()
+        {
+            var options = new Windows.Storage.Search.QueryOptions(Windows.Storage.Search.CommonFolderQuery.DefaultQuery);
+            var query = ApplicationData.Current.LocalCacheFolder.CreateFolderQueryWithOptions(options);
+            query.ContentsChanged += Query_ContentsChanged;
+            await query.GetFoldersAsync();
+
+            async void Query_ContentsChanged(Windows.Storage.Search.IStorageQueryResultBase sender, object args)
+            {
+                if (IsDownloaded && !(await query.GetFoldersAsync()).Any(sf => sf.Name == Isbn))
+                {
+                    query.ContentsChanged -= Query_ContentsChanged;
+
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        IsDownloaded = false;
+                        IsDownloadable = true;
+                        IsPinnable = false;
+                    });
                 }
             }
         }

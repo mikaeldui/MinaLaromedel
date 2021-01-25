@@ -25,6 +25,7 @@ namespace Hermods.Novo.Client.Tests
                 liberClient = await hermodsClient.GetLiberOnlinebokClientAsync(ebooks[0]);
             }
 
+            using (liberClient)
             {
                 var document = await liberClient.GetDocumentAsync();
 

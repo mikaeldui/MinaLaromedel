@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Security.Credentials;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -39,14 +40,11 @@ namespace MinaLaromedel.Views
             LoginProgressRing.IsActive = true;
 
             // Login
+            PasswordCredential credential = new PasswordCredential("Hermods Novo", UsernameTextBox.Text, PasswordBoxControl.Password);
 
-            if (await EbookService.TryAuthenticateAsync(UsernameTextBox.Text, PasswordBoxControl.Password))
+            if (await EbookService.TryAuthenticateAsync(credential))
             {
-                var settings = ApplicationData.Current.RoamingSettings;
-
-                settings.Values["username"] = UsernameTextBox.Text;
-                settings.Values["password"] = PasswordBoxControl.Password;
-
+                (new PasswordVault()).Add(credential);
                 Frame.Navigate(typeof(MainPage));
             }
             else
@@ -56,7 +54,6 @@ namespace MinaLaromedel.Views
                 UsernameTextBox.IsEnabled = PasswordBoxControl.IsEnabled = LoginButton.IsEnabled = true;
                 LoginProgressRing.IsActive = false;
                 LoginFormStackPanel.Opacity = 1;
-
             }
         }
     }

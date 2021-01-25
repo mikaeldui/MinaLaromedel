@@ -14,6 +14,7 @@ using System.Net;
 using GalaSoft.MvvmLight.Messaging;
 using MinaLaromedel.Messages;
 using System.Threading;
+using Windows.Security.Credentials;
 
 namespace MinaLaromedel.Services
 {
@@ -27,15 +28,27 @@ namespace MinaLaromedel.Services
 
         #region Authenticate
 
-        public static async Task<bool> TryAuthenticateAsync() => await TryAuthenticateAsync(SettingsService.Username, SettingsService.Password);
-
-        public static async Task<bool> TryAuthenticateAsync(string username, string password)
+        public static async Task<bool> TryAuthenticateAsync()
         {
+            var vault = new PasswordVault();
+            PasswordCredential credential = vault.FindAllByResource("Hermods Novo").FirstOrDefault();
+            if (await TryAuthenticateAsync(credential))
+                return true;
+            else
+            {
+                vault.Remove(credential);
+                return false;
+            }
+        }
+
+        public static async Task<bool> TryAuthenticateAsync(PasswordCredential credential)
+        {
+            if (credential == null) throw new ArgumentNullException(nameof(credential));
+
             try
             {
-                await _hermodsNovoClient.Value.AuthenticateAsync(username, password);
-                SettingsService.Username = username;
-                SettingsService.Password = password;
+                credential.RetrievePassword();
+                await _hermodsNovoClient.Value.AuthenticateAsync(credential.UserName, credential.Password);
                 return true;
             }
             catch

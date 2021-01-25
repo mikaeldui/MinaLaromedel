@@ -34,7 +34,7 @@
                             </Image.Source>
                         </Image>
                         <CommandBar Background="{ThemeResource SystemControlAcrylicElementBrush}" IsOpen="False" DefaultLabelPosition="Right" VerticalAlignment="Bottom">
-                            <AppBarButton Icon="Pin" Label="Fäst" Command="{Binding Pin}" IsEnabled="{Binding IsDownloaded}" />
+                            <AppBarButton Icon="Pin" Label="Fäst" Command="{Binding Pin}" IsEnabled="{Binding IsPinnable}" />
                             <AppBarButton Icon="Download" Label="Ladda ner" Command="{Binding Download}" IsEnabled="{Binding IsDownloadable}" />
                         </CommandBar>
                         <Grid Background="{ThemeResource SystemControlAcrylicElementBrush}" Visibility="{Binding IsDownloading, Converter={StaticResource BooleanToVisibilityConverter}}">                            

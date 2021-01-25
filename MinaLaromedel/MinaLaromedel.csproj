@@ -134,6 +134,7 @@
       <DependentUpon>PageOpening.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\LongToSizeConverter.cs" />
     <Compile Include="Extensions\StorageExtensions.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -150,6 +151,7 @@
     <Compile Include="Tiles\EbookTile.cs" />
     <Compile Include="ViewModels\EbookOpeningViewModel.cs" />
     <Compile Include="ViewModels\EbookViewModel.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Views\EbooksPage.xaml.cs">
       <DependentUpon>EbooksPage.xaml</DependentUpon>
     </Compile>

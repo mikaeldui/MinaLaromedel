@@ -10,24 +10,8 @@ namespace MinaLaromedel.Converters
 {
     public class BooleanToVisibilityConverter : IValueConverter
     {
-        private object GetVisibility(object value)
-        {
-            if (!(value is bool))
-                return Visibility.Collapsed;
-            bool objValue = (bool)value;
-            if (objValue)
-            {
-                return Visibility.Visible;
-            }
-            return Visibility.Collapsed;
-        }
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            return GetVisibility(value);
-        }
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
+        public object Convert(object value, Type targetType, object parameter, string language) => value is bool b && b ? Visibility.Visible : Visibility.Collapsed;
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
     }
 }

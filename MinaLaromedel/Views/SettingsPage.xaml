@@ -1,33 +1,58 @@
 ﻿<Page
-    x:Class="MinaLaromedel.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MinaLaromedel.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Custom="using:MinaLaromedel.Converters"
+    x:Class="MinaLaromedel.Views.SettingsPage"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    >
+
+    <Page.Resources>
+        <Custom:LongToSizeConverter x:Key="LongToSizeConverter"/>
+    </Page.Resources>
+    <Page.Background>
+        <ThemeResource ResourceKey="ApplicationPageBackgroundThemeBrush"/>
+    </Page.Background>
 
     <Grid>
         <StackPanel>
-            <StackPanel Margin="0,0,0,12" >
+            <StackPanel x:Name="MyAccountStackPanel" Margin="0,0,0,12">
                 <TextBlock Text="Mitt konto" FontSize="36" Margin="0,6" />
                 <StackPanel Orientation="Horizontal" Margin="0,6">
                     <TextBlock Text="Inloggad som: " Margin="0,0,6,0" />
-                    <TextBlock Text="{x:Bind Username}" />
+                    <TextBlock Text="{x:Bind Path=ViewModel.Username}" />
                 </StackPanel>
                 <Button Content="Logga ut" Margin="0,6">
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel>
                                 <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="All sparad information tas bort. Vill du fortsätta?" Margin="0,0,0,12" />
-                                <Button x:Name="LogoutButton" Click="LogoutButton_Click" Content="Ja, logga ut mig" />
+                                <Button x:Name="LogoutButton" Content="Ja, logga ut mig" Command="{x:Bind Path=ViewModel.Logout}"/>
                             </StackPanel>
                         </Flyout>
                     </Button.Flyout>
                 </Button>
             </StackPanel>
-            <StackPanel Margin="0,0,0,12" >
+            <StackPanel x:Name="CacheStackPanel" Margin="0,0,0,12">
+                <TextBlock Text="Cache" FontSize="36" Margin="0,6" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Appens cache innehåller böckerna. Total storlek: " Margin="0,0,6,0" />
+                    <TextBlock Text="{x:Bind Mode=OneWay, FallbackValue='Bearbetar...', Path=ViewModel.CacheSize, Converter={StaticResource LongToSizeConverter}}" />
+                </StackPanel>
+                <Button Content="Töm cache" Margin="0,6">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel>
+                                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Böckerna behöver laddas ner igen efter detta. Vill du fortsätta?" Margin="0,0,0,12" />
+                                <Button x:Name="ClearCacheButton" Content="Ja, töm cachen" Command="{x:Bind Path=ViewModel.ClearCache}"/>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+            <StackPanel x:Name="GitHubStackPanel" Margin="0,0,0,12" >
                 <TextBlock Text="GitHub" FontSize="36" Margin="0,6" />
                 <TextBlock Text="Appen utvecklas med öppen källkod. Bidra gärna!" />
                 <HyperlinkButton Content="github.com/mikaeldui/MinaLaromedel" NavigateUri="https://github.com/mikaeldui/MinaLaromedel" />
