@@ -22,7 +22,7 @@
         <StackPanel Grid.ColumnSpan="3" VerticalAlignment="Center">
             <TextBlock Text="Mina läromedel" HorizontalAlignment="Center" FontSize="100"/>
         </StackPanel>
-        <StackPanel x:Name="LoginFormStackPanel" Grid.Row="1" Grid.Column="1">
+        <StackPanel x:Name="LoginFormStackPanel" Grid.Row="1" Grid.Column="1" MaxWidth="300">
             <TextBlock x:Name="ErrorMessageTextBlock" Text="" FontSize="20" Margin="4" Foreground="Red" TextAlignment="Center"/>
             <TextBlock Text="Hermods-användarnamn" Margin="0,0,0,12" />
             <TextBox x:Name="UsernameTextBox" PlaceholderText="förnamn.efternamn@domän.se" Margin="0,0,0,12" />
@@ -30,6 +30,11 @@
             <PasswordBox x:Name="PasswordBoxControl" PlaceholderText="Ditt lösenord" Margin="0,0,0,12" />
             <Button x:Name="LoginButton" Content="Logga in" Click="LoginButton_Click" />
             <HyperlinkButton Content="Återställ lösenord" NavigateUri="https://novo.hermods.se/login/forgot_password.php" />
+        </StackPanel>
+        <StackPanel x:Name="LinksStackPanel" Grid.Row="2" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Orientation="Horizontal">
+            <HyperlinkButton Content="Källkod" Margin="6" NavigateUri="https://github.com/mikaeldui/MinaLaromedel" />
+            <HyperlinkButton Content="Sekretesspolicy" Margin="6" NavigateUri="https://github.com/mikaeldui/MinaLaromedel/blob/main/PRIVACYPOLICY.md" />
+            <HyperlinkButton Content="Feedback" Margin="6" NavigateUri="https://github.com/mikaeldui/MinaLaromedel/issues" />
         </StackPanel>
         <ProgressRing x:Name="LoginProgressRing" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="100" Width="100" />
     </Grid>

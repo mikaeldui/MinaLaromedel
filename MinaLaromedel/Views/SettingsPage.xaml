@@ -39,7 +39,7 @@
                 <TextBlock Text="Cache" FontSize="36" Margin="0,6" />
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Appens cache innehåller böckerna. Total storlek: " Margin="0,0,6,0" />
-                    <TextBlock Text="{x:Bind Mode=OneWay, FallbackValue='Bearbetar...', Path=ViewModel.CacheSize, Converter={StaticResource LongToSizeConverter}}" />
+                    <TextBlock Text="{x:Bind Mode=OneWay, FallbackValue='Bearbetar...', Path=ViewModel.CacheSize, Converter={StaticResource LongToSizeConverter}}" Margin="0,6" />
                 </StackPanel>
                 <Button Content="Töm cache" Margin="0,6">
                     <Button.Flyout>
@@ -54,7 +54,7 @@
             </StackPanel>
             <StackPanel x:Name="GitHubStackPanel" Margin="0,0,0,12" >
                 <TextBlock Text="GitHub" FontSize="36" Margin="0,6" />
-                <TextBlock Text="Appen utvecklas med öppen källkod. Bidra gärna!" />
+                <TextBlock Text="Appen utvecklas med öppet på GitHub. Bidra gärna med kod, frågor eller förslag på förbättringar!" />
                 <HyperlinkButton Content="github.com/mikaeldui/MinaLaromedel" NavigateUri="https://github.com/mikaeldui/MinaLaromedel" />
             </StackPanel>
         </StackPanel>
