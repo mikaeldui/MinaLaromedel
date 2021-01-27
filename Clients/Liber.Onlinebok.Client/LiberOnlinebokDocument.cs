@@ -33,7 +33,7 @@ namespace Liber.Onlinebok
     {
         public Guid Uuid { get; set; }
         public string Type { get; set; }
-        public string ContentId { get; set; }
+        public Guid ContentId { get; set; }
         public string Label { get; set; }
         public bool ShowToc { get; set; }
     }
