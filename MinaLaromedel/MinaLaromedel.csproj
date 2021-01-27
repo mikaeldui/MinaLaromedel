@@ -293,7 +293,7 @@
       <Name>Liber.Onlinebok.Client</Name>
     </ProjectReference>
     <ProjectReference Include="..\MinaLaromedel.Tasks\MinaLaromedel.Tasks.csproj">
-      <Project>{9fc6520d-7b50-46a0-acbd-e4a70d358a9a}</Project>
+      <Project>{1a664562-b6d4-4d99-b034-39591f24eef0}</Project>
       <Name>MinaLaromedel.Tasks</Name>
     </ProjectReference>
   </ItemGroup>
