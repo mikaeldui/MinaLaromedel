@@ -130,34 +130,23 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Collections\ObservableViewModelCollection.cs" />
     <Compile Include="Controls\PageOpening.xaml.cs">
       <DependentUpon>PageOpening.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\LongToSizeConverter.cs" />
-    <Compile Include="EbookProviders\EbookProviderManager.cs" />
-    <Compile Include="EbookProviders\EbookProviderNameAttribute.cs" />
-    <Compile Include="EbookProviders\HermodsNovoEbookProvider.cs" />
-    <Compile Include="EbookProviders\IEbookProvider.cs" />
-    <Compile Include="Extensions\ReflectionExtensions.cs" />
-    <Compile Include="Extensions\StorageExtensions.cs" />
+    <Compile Include="Helpers\UIThread.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Messages\DownloadStatusMessage.cs" />
-    <Compile Include="Messages\OpenEbookMessage.cs" />
-    <Compile Include="Messages\ShowPageMessage.cs" />
-    <Compile Include="Models\Ebook.cs" />
+    <Compile Include="Managers\EbookManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\EbookService.cs" />
-    <Compile Include="Services\SettingsService.cs" />
-    <Compile Include="Storage\EbookStorage.cs" />
-    <Compile Include="Storage\PageStorage.cs" />
-    <Compile Include="Tiles\EbookTile.cs" />
     <Compile Include="ViewModels\EbookOpeningViewModel.cs" />
+    <Compile Include="ViewModels\EbooksViewModel.cs" />
     <Compile Include="ViewModels\EbookViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\EbooksPage.xaml.cs">
       <DependentUpon>EbooksPage.xaml</DependentUpon>
     </Compile>
@@ -273,6 +262,9 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.11</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
+      <Version>2.0.1</Version>
+    </PackageReference>
     <PackageReference Include="MvvmLight">
       <Version>5.4.1.1</Version>
     </PackageReference>
@@ -280,9 +272,7 @@
       <Version>12.0.3</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Clients\Hermods.Novo.Client\Hermods.Novo.Client.csproj">
       <Project>{c472d801-fedb-43d4-9e7c-709551e1a202}</Project>
@@ -291,6 +281,10 @@
     <ProjectReference Include="..\Clients\Liber.Onlinebok.Client\Liber.Onlinebok.Client.csproj">
       <Project>{b8614598-b108-4190-87d3-7c6556d35eb7}</Project>
       <Name>Liber.Onlinebok.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MinaLaromedel.Logic\MinaLaromedel.Logic.csproj">
+      <Project>{cc9f2ffc-790d-4bec-8bf0-2fefd980fa59}</Project>
+      <Name>MinaLaromedel.Logic</Name>
     </ProjectReference>
     <ProjectReference Include="..\MinaLaromedel.Tasks\MinaLaromedel.Tasks.csproj">
       <Project>{1a664562-b6d4-4d99-b034-39591f24eef0}</Project>

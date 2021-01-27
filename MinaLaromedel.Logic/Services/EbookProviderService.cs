@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MinaLaromedel.EbookProviders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using Windows.Security.Credentials;
 
 namespace MinaLaromedel.EbookProviders
 {
-    public static class EbookProviderManager
+    public static class EbookProviderService
     {
         private static readonly Dictionary<(string, string), IEbookProvider> _activeProviders = new Dictionary<(string, string), IEbookProvider>();
         private static readonly Dictionary<string, Type> _providerTypes = new Dictionary<string, Type>();

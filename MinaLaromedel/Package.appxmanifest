@@ -46,6 +46,8 @@
             <uap:DisplayName>Mina läromedel</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
+        <Extension Category="windows.updateTask" EntryPoint="MinaLaromedel.Tasks.UpdateTask">  
+        </Extension>  
       </Extensions>
     </Application>
   </Applications>

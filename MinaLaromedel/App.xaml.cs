@@ -25,6 +25,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using MinaLaromedel.Managers;
 
 namespace MinaLaromedel
 {
@@ -54,21 +55,12 @@ namespace MinaLaromedel
         {
             Frame rootFrame = Window.Current.Content as Frame;
 
-            // Do not repeat app initialization when the Window already has content,
-            // just ensure that the window is active
             if (rootFrame == null)
             {
-                // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
-                {
-                    //TODO: Load state from previously suspended application
-                }
-
-                // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
             }
 
@@ -90,10 +82,15 @@ namespace MinaLaromedel
                 Window.Current.Activate();
             }
 
-            if(e.TileId != null && e.TileId.StartsWith("isbn-"))
+            if(e.TileId != null && e.TileId.StartsWith("isbn-") && SettingsService.IsCredentialsSaved())
             {
-                var decoder = new WwwFormUrlDecoder(e.Arguments);
-                Messenger.Default.Send(new OpenEbookMessage(decoder.GetFirstValueByName("isbn")));
+                string isbn;
+                {
+                    var decoder = new WwwFormUrlDecoder(e.Arguments);
+                    isbn = decoder.GetFirstValueByName("isbn");
+                }
+
+                _showReadingWindow(isbn);
             }
         }
 
@@ -101,15 +98,72 @@ namespace MinaLaromedel
         {
             if (args.Kind == ActivationKind.Protocol)
             {
+                Frame rootFrame = Window.Current.Content as Frame;
+
+                if (rootFrame == null)
+                {
+                    rootFrame = new Frame();
+
+                    rootFrame.NavigationFailed += OnNavigationFailed;
+
+                    Window.Current.Content = rootFrame;
+                }
+
+                if (rootFrame.Content == null)
+                {
+                    if (!SettingsService.IsCredentialsSaved())
+                        rootFrame.Navigate(typeof(LoginPage));
+                    else
+                    {
+                        // When the navigation stack isn't restored navigate to the first page,
+                        // configuring the new page by passing required information as a navigation
+                        // parameter
+                        rootFrame.Navigate(typeof(MainPage));
+                    }
+                }
+                // Ensure the current window is active
+                Window.Current.Activate();
+
                 ProtocolActivatedEventArgs eventArgs = args as ProtocolActivatedEventArgs;
                 // TODO: Handle URI activation
                 // The received URI is eventArgs.Uri.AbsoluteUri
 
-                if (eventArgs.Uri.Scheme == "mina-laromedel")
+                if (eventArgs.Uri.Scheme == "mina-laromedel" && SettingsService.IsCredentialsSaved())
                 {
                     var decoder = new WwwFormUrlDecoder(eventArgs.Uri.Query);
-                    Messenger.Default.Send(new ShowEbookPageMessage { PageNumber = int.Parse(decoder.GetFirstValueByName("page")) }, eventArgs.Uri.AbsolutePath);
+                    string isbn = eventArgs.Uri.AbsolutePath;
+                    int page = int.Parse(decoder.GetFirstValueByName("page"));
+                    _showReadingWindow(isbn, page);
                 }
+            }
+        }
+
+        private void _showReadingWindow(string isbn, int? pageIndex = null)
+        {
+            if (EbookManager.Ebooks.Count == 0)
+            {
+                EbookManager.EbooksLoaded += EbookManager_EbooksLoaded;
+
+                void EbookManager_EbooksLoaded(object sender, EventArgs e)
+                {
+                    EbookManager.EbooksLoaded -= EbookManager_EbooksLoaded;
+
+                    _ = showAsync(isbn, pageIndex);
+                }
+            }
+            else
+            {
+                _ = showAsync(isbn, pageIndex);
+            }
+
+            async Task showAsync(string isbn, int? pageIndex)
+            {
+                await UIThread.RunAsync(async () =>
+                {
+                    await ReadingPage.TryShowWindowAsync(EbookManager.Ebooks.First(eb => eb.Isbn == isbn));
+                    if(pageIndex != null)
+                        Messenger.Default.Send(new ShowEbookPageMessage { PageNumber = pageIndex.Value }, isbn);
+                });
             }
         }
 

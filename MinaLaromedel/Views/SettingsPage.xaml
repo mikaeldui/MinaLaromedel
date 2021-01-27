@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Custom="using:MinaLaromedel.Converters"
     x:Class="MinaLaromedel.Views.SettingsPage"
+    DataContext="{Binding Settings, Source={StaticResource ViewModelLocator}}"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -21,14 +22,14 @@
                 <TextBlock Text="Mitt konto" FontSize="36" Margin="0,6" />
                 <StackPanel Orientation="Horizontal" Margin="0,6">
                     <TextBlock Text="Inloggad som: " Margin="0,0,6,0" />
-                    <TextBlock Text="{x:Bind Path=ViewModel.Username}" />
+                    <TextBlock Text="{Binding Username}" />
                 </StackPanel>
                 <Button Content="Logga ut" Margin="0,6">
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel>
                                 <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="All sparad information tas bort. Vill du fortsätta?" Margin="0,0,0,12" />
-                                <Button x:Name="LogoutButton" Content="Ja, logga ut mig" Command="{x:Bind Path=ViewModel.Logout}"/>
+                                <Button x:Name="LogoutButton" Content="Ja, logga ut mig" Command="{Binding Logout}"/>
                             </StackPanel>
                         </Flyout>
                     </Button.Flyout>
@@ -38,14 +39,14 @@
                 <TextBlock Text="Cache" FontSize="36" Margin="0,6" />
                 <StackPanel Orientation="Horizontal" Margin="0,6">
                     <TextBlock Text="Appens cache innehåller böckerna. Total storlek: " Margin="0,0,6,0"/>
-                    <TextBlock Text="{x:Bind Mode=OneWay, FallbackValue='Bearbetar...', Path=ViewModel.CacheSize, Converter={StaticResource LongToSizeConverter}}" />
+                    <TextBlock Text="{Binding CacheSize, Converter={StaticResource LongToSizeConverter}}" />
                 </StackPanel>
                 <Button Content="Töm cache" Margin="0,6">
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel>
                                 <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Böckerna behöver laddas ner igen efter detta. Vill du fortsätta?" Margin="0,0,0,12" />
-                                <Button x:Name="ClearCacheButton" Content="Ja, töm cachen" Command="{x:Bind Path=ViewModel.ClearCache}"/>
+                                <Button x:Name="ClearCacheButton" Content="Ja, töm cachen" Command="{Binding ClearCache}"/>
                             </StackPanel>
                         </Flyout>
                     </Button.Flyout>

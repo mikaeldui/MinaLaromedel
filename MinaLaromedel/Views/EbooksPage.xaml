@@ -5,9 +5,12 @@
     xmlns:viewModels="using:MinaLaromedel.ViewModels"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:Custom="using:MinaLaromedel.Converters"
     x:Class="MinaLaromedel.Views.EbooksPage"
     mc:Ignorable="d"
+    DataContext="{Binding Ebooks, Source={StaticResource ViewModelLocator}}"
     >
 
     <Page.Resources>
@@ -18,7 +21,12 @@
     </Page.Background>
 
     <Grid>
-        <GridView x:Name="EbooksGrid" ItemsSource="{x:Bind Path=Ebooks}" ItemClick="EbooksGrid_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
+        <GridView x:Name="EbooksGrid" ItemsSource="{Binding Ebooks}" ItemClick="EbooksGrid_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
+            <!--<i:Interaction.Behaviors>
+                <core:EventTriggerBehavior EventName="ItemClick">
+                    <core:InvokeCommandAction Command="{Binding MenuItemCommand}"></core:InvokeCommandAction>
+                </core:EventTriggerBehavior>
+            </i:Interaction.Behaviors>-->
             <GridView.ItemContainerStyle>
                 <Style TargetType="GridViewItem">
                     <Setter Property="Margin" Value="5, 5, 5, 5"/>
@@ -48,7 +56,7 @@
             </GridView.ItemTemplate>
         </GridView>
         <CommandBar Background="Transparent" IsOpen="False" DefaultLabelPosition="Right" VerticalAlignment="Bottom">
-            <AppBarButton x:Name="RefreshButton" Icon="Refresh" Label="Uppdatera" Click="RefreshButton_Click" IsEnabled="False"/>
+            <AppBarButton x:Name="RefreshButton" Icon="Refresh" Label="Uppdatera" Command="{Binding Refresh}" IsEnabled="{Binding CanRefresh}"/>
         </CommandBar>
     </Grid>
 </Page>

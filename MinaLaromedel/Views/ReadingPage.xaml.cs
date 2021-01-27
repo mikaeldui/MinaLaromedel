@@ -1,6 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 using MinaLaromedel.Messages;
-using MinaLaromedel.Services;
 using MinaLaromedel.Storage;
 using MinaLaromedel.ViewModels;
 using System;
@@ -149,8 +148,10 @@ namespace MinaLaromedel.Views
 
         private void CopyLinkButton_Click(object sender, RoutedEventArgs e)
         {
-            DataPackage dataPackage = new DataPackage();
-            dataPackage.RequestedOperation = DataPackageOperation.Copy;
+            DataPackage dataPackage = new DataPackage
+            {
+                RequestedOperation = DataPackageOperation.Copy
+            };
             dataPackage.SetText($"mina-laromedel:{Ebook.Isbn}?page={EbookFlipView.SelectedIndex * 2}");
             Clipboard.SetContent(dataPackage);
         }
@@ -186,17 +187,13 @@ namespace MinaLaromedel.Views
         private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
         {
             if (args.DidSizeChange)
-            {
                 _tryExitFullScreen();
-            }
         }
 
         private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Escape)
-            {
                 _tryExitFullScreen();
-            }
         }
 
         private bool _tryExitFullScreen()
@@ -223,8 +220,8 @@ namespace MinaLaromedel.Views
 
         public static async Task<bool> TryShowWindowAsync(EbookViewModel ebookViewModel)
         {
-            if (App.ReadingWindows.ContainsKey(ebookViewModel))
-                return await App.ReadingWindows[ebookViewModel].TryShowAsync();
+            if (App.ReadingWindows.Keys.Any(rw => rw.Isbn == ebookViewModel.Isbn))
+                return await App.ReadingWindows[App.ReadingWindows.Keys.First(evm => evm.Isbn == ebookViewModel.Isbn)].TryShowAsync();
 
             AppWindow readingWindow = await AppWindow.TryCreateAsync();
             App.ReadingWindows.Add(ebookViewModel, readingWindow);
@@ -239,7 +236,6 @@ namespace MinaLaromedel.Views
             readingWindowContentFrame.Navigate(typeof(ReadingPage), ebookViewModel);
 
             ElementCompositionPreview.SetAppWindowContent(readingWindow, readingWindowContentFrame);
-
 
             return await readingWindow.TryShowAsync();
         }
