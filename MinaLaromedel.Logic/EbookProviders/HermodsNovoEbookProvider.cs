@@ -13,9 +13,11 @@ using Windows.Security.Credentials;
 
 namespace MinaLaromedel.EbookProviders
 {
-    [EbookProviderName("Hermods Novo")]
+    [EbookProviderName(PROVIDER_NAME)]
     public class HermodsNovoEbookProvider : IEbookProvider, IDisposable
     {
+        private const string PROVIDER_NAME = "Hermods Novo";
+
         private HermodsNovoClient _hermodsNovoClient = new HermodsNovoClient();
 
         public async Task<bool> AuthenticateAsync(PasswordCredential credential)
@@ -78,19 +80,21 @@ namespace MinaLaromedel.EbookProviders
         {
             var hermodsEbooks = await _hermodsNovoClient.GetEbooksAsync();
 
-            return hermodsEbooks.Select(he => new Ebook
-            {
-                Title = he.Title,
-                Isbn = he.Isbn,
-                Expires = he.EndDate,
-                Publisher = he.Publisher,
-
-                Provider = "Hermods Novo",
-                ProviderAttributes =
-                {
-                    { "url", he.Url?.ToString() }
-                }
-            }).ToArray();
+            return hermodsEbooks.Select(ConvertToEbook).ToArray();
         }
+
+        public static Ebook ConvertToEbook(HermodsNovoEbook hermodsNovoEbook) => new Ebook
+        {
+            Title = hermodsNovoEbook.Title,
+            Isbn = hermodsNovoEbook.Isbn,
+            Expires = hermodsNovoEbook.EndDate,
+            Publisher = hermodsNovoEbook.Publisher,
+
+            Provider = PROVIDER_NAME,
+            ProviderAttributes =
+                {
+                    { "url", hermodsNovoEbook.Url?.ToString() }
+                }
+        };
     }
 }
