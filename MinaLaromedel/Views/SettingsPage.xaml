@@ -36,8 +36,8 @@
             </StackPanel>
             <StackPanel x:Name="CacheStackPanel" Margin="0,0,0,12">
                 <TextBlock Text="Cache" FontSize="36" Margin="0,6" />
-                <StackPanel Orientation="Horizontal" Margin="0,0,6,0">
-                    <TextBlock Text="Appens cache innehåller böckerna. Total storlek: " />
+                <StackPanel Orientation="Horizontal" Margin="0,6">
+                    <TextBlock Text="Appens cache innehåller böckerna. Total storlek: " Margin="0,0,6,0"/>
                     <TextBlock Text="{x:Bind Mode=OneWay, FallbackValue='Bearbetar...', Path=ViewModel.CacheSize, Converter={StaticResource LongToSizeConverter}}" />
                 </StackPanel>
                 <Button Content="Töm cache" Margin="0,6">
