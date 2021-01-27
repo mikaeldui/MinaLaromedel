@@ -31,7 +31,5 @@ namespace MinaLaromedel.Views
         {
             this.InitializeComponent();
         }
-
-        public SettingsViewModel ViewModel { get; } = new SettingsViewModel();
     }
 }

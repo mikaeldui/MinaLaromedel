@@ -17,7 +17,10 @@ namespace MinaLaromedel.Storage
 
         private static StorageFolder StorageFolder => ApplicationData.Current.LocalFolder;
 
-        public static async Task<Ebook[]> GetEbooksAsync() => await StorageFolder.ContainsFileAsync(FILE_NAME) ? await StorageFolder.GetObjectAsync<Ebook[]>(FILE_NAME) : null;
+        /// <summary>
+        /// Returns an empty array if no e-books were found.
+        /// </summary>
+        public static async Task<Ebook[]> GetEbooksAsync() => await StorageFolder.ContainsFileAsync(FILE_NAME) ? await StorageFolder.GetObjectAsync<Ebook[]>(FILE_NAME) : new Ebook[0];
 
         public static async Task SaveEbooksAsync(Ebook[] ebooks) => await StorageFolder.CreateFileAsync(FILE_NAME, CreationCollisionOption.ReplaceExisting, ebooks);
     }

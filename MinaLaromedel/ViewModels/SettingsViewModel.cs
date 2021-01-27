@@ -23,7 +23,10 @@ namespace MinaLaromedel.ViewModels
         {
             ClearCache = new RelayCommand(async () => { await ApplicationData.Current.LocalCacheFolder.DeleteAsync(); await RefreshCacheSizeAsync(); });
 
-            _ = RefreshCacheSizeAsync();
+            if (!IsInDesignModeStatic)
+            {
+                _ = RefreshCacheSizeAsync();
+            }
         }
 
         public string Username => (new PasswordVault()).FindAllByResource("Hermods Novo").FirstOrDefault()?.UserName;
@@ -69,7 +72,7 @@ namespace MinaLaromedel.ViewModels
             // Sum all of them up. You have to convert it to a long because Sum does not accept ulong.
             var folderSize = sizes.Sum(l => (long)l);
 
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => CacheSize = folderSize);
+            await UIThread.RunAsync(() => CacheSize = folderSize);
         }
     }
 }

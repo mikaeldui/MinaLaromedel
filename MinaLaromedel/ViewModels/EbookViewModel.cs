@@ -17,6 +17,9 @@ using MinaLaromedel.Messages;
 using MinaLaromedel.Tiles;
 using Windows.Storage;
 using MinaLaromedel.Models;
+using MinaLaromedel.Managers;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
 
 namespace MinaLaromedel.ViewModels
 {
@@ -35,6 +38,7 @@ namespace MinaLaromedel.ViewModels
             _ebook = ebook;
             Title = ebook.Title;
             Isbn = ebook.Isbn;
+            IsPinnable = !EbookTile.Exists(_ebook.Isbn);
 
             Download = new RelayCommand(async () =>
             {
@@ -46,7 +50,7 @@ namespace MinaLaromedel.ViewModels
                     DownloadStatus = $"{msg.Done} av {msg.Total} sidor nerladdade";
                 });
 
-                await EbookService.DownloadEbookAsync(_ebook);
+                await EbookManager.DownloadEbookAsync(_ebook);
 
                 IsDownloading = false;
                 IsDownloaded = true;
@@ -67,24 +71,24 @@ namespace MinaLaromedel.ViewModels
                 if (!await PageStorage.EbookExistsAsync(_ebook))
                 {
                     if (NetworkInformation.GetInternetConnectionProfile() != null)
-                        IsDownloadable = true;
+                        _ = UIThread.RunAsync(() => IsDownloadable = true);
                 }
                 else
                 {
-                    IsDownloaded = true;
-                    IsPinnable = await Task.Run(() => !EbookTile.Exists(_ebook.Isbn));
+                    _ = UIThread.RunAsync(() => IsDownloaded = true);
 
                     try
                     {
-                        FrontPagePath = await PageStorage.GetPagePathAsync(_ebook, 1);
+                       _ = UIThread.RunAsync(async () => FrontPagePath = await PageStorage.GetPagePathAsync(_ebook, 1));
                     }
                     catch { }
 
                     _ = _watchForDirectoryRemoval();
                 }
-
             });
         }
+
+        public static EbookViewModel From(Ebook ebook) => new EbookViewModel(ebook);
 
         public string Title { get; }
 
@@ -193,7 +197,7 @@ namespace MinaLaromedel.ViewModels
                 {
                     query.ContentsChanged -= Query_ContentsChanged;
 
-                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    await UIThread.RunAsync(() =>
                     {
                         IsDownloaded = false;
                         IsDownloadable = true;

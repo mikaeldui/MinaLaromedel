@@ -28,50 +28,9 @@ namespace MinaLaromedel.Views
     /// </summary>
     public sealed partial class EbooksPage : Page
     {
-        public ObservableCollection<EbookViewModel> Ebooks => EbookService.Ebooks;
-
         public EbooksPage()
         {
             this.InitializeComponent();
-        }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            _ = EbookService.LoadEbooksAsync(Dispatcher)
-                            .ContinueWith(async _ => 
-                            { 
-                                if (EbookService.Ebooks.Count == 0)
-                                {
-                                    try
-                                    {
-                                        await EbookService.RefreshEbooksAsync(Dispatcher);
-                                    }
-                                    catch
-                                    {
-
-                                    }
-                                }
-
-                                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                                {
-                                    RefreshButton.IsEnabled = true;
-                                });
-                            });
-
-            base.OnNavigatedTo(e);
-        }
-
-        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            RefreshButton.IsEnabled = false;
-            try
-            {
-                await EbookService.RefreshEbooksAsync(Dispatcher);
-            }
-            finally
-            {
-                RefreshButton.IsEnabled = true;
-            }
         }
 
         private async void EbooksGrid_ItemClick(object sender, ItemClickEventArgs e)

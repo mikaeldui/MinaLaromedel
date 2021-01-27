@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
+using MinaLaromedel.Managers;
 using MinaLaromedel.Messages;
 using MinaLaromedel.Services;
 using MinaLaromedel.Storage;
@@ -31,16 +32,6 @@ namespace MinaLaromedel
         public MainPage()
         {
             this.InitializeComponent();
-
-            Messenger.Default.Register<OpenEbookMessage>(this, async ebook =>
-            {
-                await EbookService.LoadEbooksAsync(Dispatcher);
-
-                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                {
-                    await ReadingPage.TryShowWindowAsync(EbookService.Ebooks.First(eb => eb.Isbn == ebook.Isbn));
-                });
-            });
         }
 
         private double NavViewCompactModeThresholdWidth { get { return NavView.CompactModeThresholdWidth; } }
@@ -176,7 +167,7 @@ namespace MinaLaromedel
             {
                 // SettingsItem is not part of NavView.MenuItems, and doesn't have a Tag.
                 NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
-                NavView.Header = "Settings";
+                NavView.Header = "Inställningar";
             }
             else if (ContentFrame.SourcePageType != null)
             {

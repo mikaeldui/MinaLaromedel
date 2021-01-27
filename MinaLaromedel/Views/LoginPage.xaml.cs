@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Security.Credentials;
+using MinaLaromedel.Managers;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -42,7 +43,7 @@ namespace MinaLaromedel.Views
             // Login
             PasswordCredential credential = new PasswordCredential("Hermods Novo", UsernameTextBox.Text, PasswordBoxControl.Password);
 
-            if (await EbookService.TryAuthenticateAsync(credential))
+            if (await CredentialsService.TryAuthenticateAsync(credential))
             {
                 (new PasswordVault()).Add(credential);
                 Frame.Navigate(typeof(MainPage));
