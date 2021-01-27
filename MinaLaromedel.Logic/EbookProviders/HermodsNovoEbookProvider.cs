@@ -83,6 +83,15 @@ namespace MinaLaromedel.EbookProviders
             return hermodsEbooks.Select(ConvertToEbook).ToArray();
         }
 
+        private static EbookChapter[] _getEbookChapters(LiberOnlinebokDocument document) => document.Structure.Root.Children.Select(c => c.Value).Select(c => new EbookChapter
+        {
+            Title = c.Label,
+            PageIndex = document.Content.ContentItems
+                .Select(ci => ci.Value)
+                .First(ci => ci.Uuid == c.ContentId)
+                .OrderingIndex
+        }).ToArray();
+
         public static Ebook ConvertToEbook(HermodsNovoEbook hermodsNovoEbook) => new Ebook
         {
             Title = hermodsNovoEbook.Title,
