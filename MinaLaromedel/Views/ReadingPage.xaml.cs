@@ -3,7 +3,6 @@ using MinaLaromedel.Messages;
 using MinaLaromedel.Services;
 using MinaLaromedel.Storage;
 using MinaLaromedel.ViewModels;
-using Hermods.Novo;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,6 +27,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
+using MinaLaromedel.Models;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -219,7 +219,7 @@ namespace MinaLaromedel.Views
 
         #region TryShowWindowAsync
 
-        public static async Task<bool> TryShowWindowAsync(HermodsNovoEbook ebook) => await TryShowWindowAsync(new EbookViewModel(ebook));
+        public static async Task<bool> TryShowWindowAsync(Ebook ebook) => await TryShowWindowAsync(new EbookViewModel(ebook));
 
         public static async Task<bool> TryShowWindowAsync(EbookViewModel ebookViewModel)
         {

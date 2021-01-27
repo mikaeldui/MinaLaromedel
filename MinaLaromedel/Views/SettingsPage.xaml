@@ -6,8 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Custom="using:MinaLaromedel.Converters"
     x:Class="MinaLaromedel.Views.SettingsPage"
-    mc:Ignorable="d"
-    >
+    mc:Ignorable="d">
 
     <Page.Resources>
         <Custom:LongToSizeConverter x:Key="LongToSizeConverter"/>
@@ -37,9 +36,9 @@
             </StackPanel>
             <StackPanel x:Name="CacheStackPanel" Margin="0,0,0,12">
                 <TextBlock Text="Cache" FontSize="36" Margin="0,6" />
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Appens cache innehåller böckerna. Total storlek: " Margin="0,0,6,0" />
-                    <TextBlock Text="{x:Bind Mode=OneWay, FallbackValue='Bearbetar...', Path=ViewModel.CacheSize, Converter={StaticResource LongToSizeConverter}}" Margin="0,6" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,6,0">
+                    <TextBlock Text="Appens cache innehåller böckerna. Total storlek: " />
+                    <TextBlock Text="{x:Bind Mode=OneWay, FallbackValue='Bearbetar...', Path=ViewModel.CacheSize, Converter={StaticResource LongToSizeConverter}}" />
                 </StackPanel>
                 <Button Content="Töm cache" Margin="0,6">
                     <Button.Flyout>
@@ -54,7 +53,7 @@
             </StackPanel>
             <StackPanel x:Name="GitHubStackPanel" Margin="0,0,0,12" >
                 <TextBlock Text="GitHub" FontSize="36" Margin="0,6" />
-                <TextBlock Text="Appen utvecklas med öppet på GitHub. Bidra gärna med kod, frågor eller förslag på förbättringar!" />
+                <TextBlock Text="Appen utvecklas öppet på GitHub och du kan skapa din egen version. Bidra gärna med kod, frågor eller förslag på förbättringar!" />
                 <HyperlinkButton Content="github.com/mikaeldui/MinaLaromedel" NavigateUri="https://github.com/mikaeldui/MinaLaromedel" />
             </StackPanel>
         </StackPanel>

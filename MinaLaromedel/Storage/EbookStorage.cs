@@ -1,4 +1,4 @@
-﻿using Hermods.Novo;
+﻿using MinaLaromedel.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,8 +17,8 @@ namespace MinaLaromedel.Storage
 
         private static StorageFolder StorageFolder => ApplicationData.Current.LocalFolder;
 
-        public static async Task<HermodsNovoEbook[]> GetEbooksAsync() => await StorageFolder.ContainsFileAsync(FILE_NAME) ? await StorageFolder.GetObjectAsync<HermodsNovoEbook[]>(FILE_NAME) : null;
+        public static async Task<Ebook[]> GetEbooksAsync() => await StorageFolder.ContainsFileAsync(FILE_NAME) ? await StorageFolder.GetObjectAsync<Ebook[]>(FILE_NAME) : null;
 
-        public static async Task SaveEbooksAsync(HermodsNovoEbook[] ebooks) => await StorageFolder.CreateFileAsync(FILE_NAME, CreationCollisionOption.ReplaceExisting, ebooks);
+        public static async Task SaveEbooksAsync(Ebook[] ebooks) => await StorageFolder.CreateFileAsync(FILE_NAME, CreationCollisionOption.ReplaceExisting, ebooks);
     }
 }

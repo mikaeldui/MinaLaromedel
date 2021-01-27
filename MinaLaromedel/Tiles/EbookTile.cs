@@ -1,4 +1,4 @@
-﻿using Hermods.Novo;
+﻿using MinaLaromedel.Models;
 using MinaLaromedel.Storage;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace MinaLaromedel.Tiles
 {
     public class EbookTile
     {
-        public static async Task<bool> RequestCreateAsync(HermodsNovoEbook ebook)
+        public static async Task<bool> RequestCreateAsync(Ebook ebook)
         {
             // Provide all the required info in arguments so that when user
             // clicks your tile, you can navigate them to the correct content
@@ -28,7 +28,7 @@ namespace MinaLaromedel.Tiles
             return await tile.RequestCreateAsync();
         }
 
-        public static async Task<bool> RequestDeleteAsync(HermodsNovoEbook ebook)
+        public static async Task<bool> RequestDeleteAsync(Ebook ebook)
         {
             SecondaryTile toBeDeleted = new SecondaryTile(_getTileId(ebook.Isbn));
 
@@ -39,7 +39,7 @@ namespace MinaLaromedel.Tiles
 
         private static string _getTileId(string isbn) => "isbn-" + isbn;
 
-        private static async Task<string> _getThumbnailPathAsync(HermodsNovoEbook ebook, int page = 1)
+        private static async Task<string> _getThumbnailPathAsync(Ebook ebook, int page = 1)
         {
             var thumbnailFile = await ApplicationData.Current.LocalFolder.CreateFileAsync($"tiles\\thumbnails\\{ebook.Isbn}.jpg", CreationCollisionOption.OpenIfExists);
             var properties = await thumbnailFile.GetBasicPropertiesAsync();

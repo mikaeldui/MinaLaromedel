@@ -24,7 +24,12 @@
         </StackPanel>
         <StackPanel x:Name="LoginFormStackPanel" Grid.Row="1" Grid.Column="1" MaxWidth="300">
             <TextBlock x:Name="ErrorMessageTextBlock" Text="" FontSize="20" Margin="4" Foreground="Red" TextAlignment="Center"/>
-            <TextBlock Text="Hermods-användarnamn" Margin="0,0,0,12" />
+            <TextBlock Text="Läromedelsleverantör" Margin="0,0,0,12" />
+            <ComboBox HorizontalAlignment="Stretch" Margin="0,0,0,12" SelectedIndex="0">
+                <ComboBoxItem Content="Hermods" IsSelected="True" />
+                <ComboBoxItem Content="Förslå gärna fler på GitHub!" IsEnabled="False" />
+            </ComboBox>
+            <TextBlock Text="Användarnamn" Margin="0,0,0,12" />
             <TextBox x:Name="UsernameTextBox" PlaceholderText="förnamn.efternamn@domän.se" Margin="0,0,0,12" />
             <TextBlock Text="Lösenord" Margin="0,0,0,12" />
             <PasswordBox x:Name="PasswordBoxControl" PlaceholderText="Ditt lösenord" Margin="0,0,0,12" />

@@ -14,6 +14,15 @@ namespace MinaLaromedel.Models
 
         public DateTime? Expires { get; set; }
 
+        public string Publisher { get; set; }
+
+        public string Provider { get; set; }
+
+        /// <summary>
+        /// Attributes specific to the provider, e.g. a URL for the ebook.
+        /// </summary>
+        public Dictionary<string, string> ProviderAttributes { get; set; } = new Dictionary<string, string>();
+
         public EbookChapter[] Chapters { get; set; }
         public EbookPage[] Pages { get; set; }
     }

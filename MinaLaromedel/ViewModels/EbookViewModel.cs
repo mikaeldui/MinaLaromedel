@@ -1,7 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using MinaLaromedel.Services;
 using MinaLaromedel.Storage;
-using Hermods.Novo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +16,13 @@ using GalaSoft.MvvmLight.Messaging;
 using MinaLaromedel.Messages;
 using MinaLaromedel.Tiles;
 using Windows.Storage;
+using MinaLaromedel.Models;
 
 namespace MinaLaromedel.ViewModels
 {
     public class EbookViewModel : ViewModelBase
     {
-        public HermodsNovoEbook _ebook;
+        public Ebook _ebook;
         private bool _isDownloaded = false;
         private bool _isDownloading = false;
         private bool _isDownloadable = false;
@@ -30,7 +30,7 @@ namespace MinaLaromedel.ViewModels
         private bool _isPinnable = false;
         private string _downloadStatus;
 
-        public EbookViewModel(HermodsNovoEbook ebook) 
+        public EbookViewModel(Ebook ebook) 
         {
             _ebook = ebook;
             Title = ebook.Title;

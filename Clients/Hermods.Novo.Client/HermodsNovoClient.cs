@@ -57,7 +57,12 @@ namespace Hermods.Novo
             if (ebook.Publisher != "Liber")
                 throw new ArgumentException("The e-book is not published by Liber.");
 
-            var response = await _httpClient.GetAsync(ebook.Url);
+            return await GetLiberOnlinebokClientAsync(ebook.Url.ToString());
+        }
+
+        public async Task<LiberOnlinebokClient> GetLiberOnlinebokClientAsync(string ebookUrl)
+        {
+            var response = await _httpClient.GetAsync(ebookUrl);
 
             _ensureSuccess(response);
 

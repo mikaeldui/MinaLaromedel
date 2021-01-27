@@ -15,44 +15,43 @@ using GalaSoft.MvvmLight.Messaging;
 using MinaLaromedel.Messages;
 using System.Threading;
 using Windows.Security.Credentials;
+using MinaLaromedel.EbookProviders;
+using MinaLaromedel.Models;
 
 namespace MinaLaromedel.Services
 {
     public static class EbookService
     {
-        private static Lazy<HermodsNovoClient> _hermodsNovoClient = new Lazy<HermodsNovoClient>();
-
         public static ObservableCollection<EbookViewModel> Ebooks { get; } = new ObservableCollection<EbookViewModel>();
 
         private static readonly SemaphoreSlim _ebooksAsyncLock = new SemaphoreSlim(1, 1);
+
 
         #region Authenticate
 
         public static async Task<bool> TryAuthenticateAsync()
         {
-            var vault = new PasswordVault();
-            PasswordCredential credential = vault.FindAllByResource("Hermods Novo").FirstOrDefault();
-            if (await TryAuthenticateAsync(credential))
-                return true;
-            else
+            var credentials = _getProviderCredentials();
+
+            bool successfullness = true;
+            foreach(var credential in credentials)
             {
-                vault.Remove(credential);
-                return false;
+                if (!await TryAuthenticateAsync(credential))
+                    successfullness = false;
             }
+
+            return successfullness;
         }
 
         public static async Task<bool> TryAuthenticateAsync(PasswordCredential credential)
         {
-            if (credential == null) throw new ArgumentNullException(nameof(credential));
+            IEbookProvider provider = EbookProviderManager.GetProvider(credential);
 
-            try
-            {
-                credential.RetrievePassword();
-                await _hermodsNovoClient.Value.AuthenticateAsync(credential.UserName, credential.Password);
+            if (await provider.AuthenticateAsync(credential))
                 return true;
-            }
-            catch
+            else
             {
+                EbookProviderManager.RemoveProvider(provider);
                 return false;
             }
         }
@@ -72,7 +71,7 @@ namespace MinaLaromedel.Services
                     if (ebooks != null)
                     {
                         // One place to do it.
-                        foreach(var ebook in ebooks.Where(eb => eb.EndDate <= DateTime.Today))
+                        foreach(var ebook in ebooks.Where(eb => eb.Expires < DateTime.Today))
                         {
                             await PageStorage.DeleteEbookAsync(ebook);
 
@@ -99,37 +98,46 @@ namespace MinaLaromedel.Services
 
             try
             {
-                HermodsNovoEbook[] ebooks;
-                try
-                {
-                    ebooks = await _hermodsNovoClient.Value.GetEbooksAsync();
-                }
-                catch
-                {
-                    await TryAuthenticateAsync();
-                    ebooks = await _hermodsNovoClient.Value.GetEbooksAsync();
-                }
+                var credentials = _getProviderCredentials();
 
-                await EbookStorage.SaveEbooksAsync(ebooks);
-
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                foreach (var credential in credentials)
                 {
-                    // remove
+                    var provider = EbookProviderManager.GetProvider(credential);
+
+                    Ebook[] ebooks;
+
+                    try
                     {
-                        var oldEbooks = Ebooks.Where(eb => !ebooks.Select(ebb => ebb.Isbn).Contains(eb.Isbn)).ToArray();
-                        foreach (var oldEbook in oldEbooks)
-                            Ebooks.Remove(oldEbook);
+                        ebooks = await provider.GetEbooksAsync();
+                    }
+                    catch
+                    {
+                        await provider.AuthenticateAsync(credential);
+                        ebooks = await provider.GetEbooksAsync();
                     }
 
-                    // Add
-                    foreach (var ebook in ebooks)
-                    {
-                        var existing = Ebooks.FirstOrDefault(eb => eb.Isbn == ebook.Isbn);
+                    await EbookStorage.SaveEbooksAsync(ebooks);
 
-                        if (existing == null)
-                            Ebooks.Add(new EbookViewModel(ebook));
-                    }
-                });
+                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        // TODO: Support for multiple providers of the same books
+                        // remove
+                        {
+                            var oldEbooks = Ebooks.Where(eb => !ebooks.Select(ebb => ebb.Isbn).Contains(eb.Isbn)).ToArray();
+                            foreach (var oldEbook in oldEbooks)
+                                Ebooks.Remove(oldEbook);
+                        }
+
+                        // Add
+                        foreach (var ebook in ebooks)
+                        {
+                            var existing = Ebooks.FirstOrDefault(eb => eb.Isbn == ebook.Isbn);
+
+                            if (existing == null)
+                                Ebooks.Add(new EbookViewModel(ebook));
+                        }
+                    });
+                }
             }
             finally
             {
@@ -137,58 +145,24 @@ namespace MinaLaromedel.Services
             }
         }
 
-        public static async Task DownloadEbookAsync(HermodsNovoEbook hermodsEbook)
+        public static async Task DownloadEbookAsync(Ebook ebook)
         {
-            switch (hermodsEbook.Publisher)
+            var credential = _getProviderCredential(ebook.Provider);
+
+            var provider = EbookProviderManager.GetProvider(credential);
+
+            try
             {
-                case "Liber":
-                    try
-                    {
-                        var hermodsClient = _hermodsNovoClient.Value;
-
-                        LiberOnlinebokClient liberClient;
-                        LiberOnlinebokDocument document;
-                        LiberOnlinebokAssetsClient assetsClient;
-
-                        try
-                        {
-                            liberClient = await _hermodsNovoClient.Value.GetLiberOnlinebokClientAsync(hermodsEbook);
-                        }
-                        catch
-                        {
-                            await TryAuthenticateAsync();
-                            liberClient = await _hermodsNovoClient.Value.GetLiberOnlinebokClientAsync(hermodsEbook);
-                        }
-
-                        using (liberClient)
-                        {
-                            document = await liberClient.GetDocumentAsync();
-                            assetsClient = await liberClient.GetAssetsClientAsync();
-                        }
-
-                        using (assetsClient)
-                        {
-                            var pageAssets = document.Content.ContentItems.Values.Select(val => (val.OrderingIndex, val.Assets.First().Uri)).ToArray();
-
-                            foreach(var asset in pageAssets)
-                            {
-                                var ebookPage = await assetsClient.GetAssetAsync(asset.Uri);
-
-                                await PageStorage.SavePageAsync(hermodsEbook, ebookPage, asset.OrderingIndex);
-
-                                Messenger.Default.Send(new DownloadStatusMessage(Array.IndexOf(pageAssets, asset), pageAssets.Length), hermodsEbook.Isbn);
-                            }
-                        }
-                    }
-                    catch (LiberOnlinebokAssetNotFoundException)
-                    {
-                        return; // Done
-                    }
-                    break;
-
-                default:
-                    throw new NotImplementedException("This publisher hasn't been implemented yet.");
+                await provider.DownloadEbookAsync(ebook);
+            }
+            catch
+            {
+                await provider.AuthenticateAsync(credential);
+                await provider.DownloadEbookAsync(ebook);
             }
         }
+
+        private static PasswordCredential _getProviderCredential(string providerName) => (new PasswordVault()).FindAllByResource(providerName).FirstOrDefault();
+        private static IReadOnlyList<PasswordCredential> _getProviderCredentials() => (new PasswordVault()).RetrieveAll().Where(pc => !string.IsNullOrEmpty(pc.Resource)).ToArray();
     }
 }

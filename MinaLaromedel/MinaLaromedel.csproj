@@ -6,6 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{B5C5DCD0-9EC7-4F25-A9D6-092D0FAE5CAA}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
+    <LangVersion>8.0</LangVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MinaLaromedel</RootNamespace>
     <AssemblyName>MinaLaromedel</AssemblyName>
@@ -135,6 +136,11 @@
     </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\LongToSizeConverter.cs" />
+    <Compile Include="EbookProviders\EbookProviderManager.cs" />
+    <Compile Include="EbookProviders\EbookProviderNameAttribute.cs" />
+    <Compile Include="EbookProviders\HermodsNovoEbookProvider.cs" />
+    <Compile Include="EbookProviders\IEbookProvider.cs" />
+    <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Extensions\StorageExtensions.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -274,7 +280,9 @@
       <Version>12.0.3</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Clients\Hermods.Novo.Client\Hermods.Novo.Client.csproj">
       <Project>{c472d801-fedb-43d4-9e7c-709551e1a202}</Project>
