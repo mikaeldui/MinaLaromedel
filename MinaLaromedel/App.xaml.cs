@@ -26,6 +26,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using MinaLaromedel.Managers;
+using Sentry;
 
 namespace MinaLaromedel
 {
@@ -36,6 +37,8 @@ namespace MinaLaromedel
     {
         public static Dictionary<EbookViewModel, AppWindow> ReadingWindows { get; } = new Dictionary<EbookViewModel, AppWindow>();
 
+        private IDisposable _sentry;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -44,6 +47,8 @@ namespace MinaLaromedel
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            SentryEnabled = SettingsService.IsAutomaticErrorReportingEnabled;
         }
 
         /// <summary>
@@ -68,7 +73,7 @@ namespace MinaLaromedel
             {
                 if (rootFrame.Content == null)
                 {
-                    if (!SettingsService.IsCredentialsSaved())
+                    if (!CredentialsService.IsCredentialsSaved())
                         rootFrame.Navigate(typeof(LoginPage), e.Arguments);
                     else
                     {
@@ -82,7 +87,7 @@ namespace MinaLaromedel
                 Window.Current.Activate();
             }
 
-            if(e.TileId != null && e.TileId.StartsWith("isbn-") && SettingsService.IsCredentialsSaved())
+            if(e.TileId != null && e.TileId.StartsWith("isbn-") && CredentialsService.IsCredentialsSaved())
             {
                 string isbn;
                 {
@@ -111,7 +116,7 @@ namespace MinaLaromedel
 
                 if (rootFrame.Content == null)
                 {
-                    if (!SettingsService.IsCredentialsSaved())
+                    if (!CredentialsService.IsCredentialsSaved())
                         rootFrame.Navigate(typeof(LoginPage));
                     else
                     {
@@ -128,7 +133,7 @@ namespace MinaLaromedel
                 // TODO: Handle URI activation
                 // The received URI is eventArgs.Uri.AbsoluteUri
 
-                if (eventArgs.Uri.Scheme == "mina-laromedel" && SettingsService.IsCredentialsSaved())
+                if (eventArgs.Uri.Scheme == "mina-laromedel" && CredentialsService.IsCredentialsSaved())
                 {
                     var decoder = new WwwFormUrlDecoder(eventArgs.Uri.Query);
                     string isbn = eventArgs.Uri.AbsolutePath;
@@ -165,6 +170,48 @@ namespace MinaLaromedel
                         Messenger.Default.Send(new ShowEbookPageMessage { PageNumber = pageIndex.Value }, isbn);
                 });
             }
+        }
+
+        public bool SentryEnabled
+        {
+            set
+            {
+                if (value)
+                {
+                    if (_sentry == null)
+                    {
+                        _sentry = SentrySdk.Init(o => 
+                        {
+                            o.Dsn = new Dsn("https://356c701be29e4197a3b9e31f29ae5051@o511625.ingest.sentry.io/5609165");
+
+                            Package package = Package.Current;
+                            PackageId packageId = package.Id;
+                            PackageVersion version = packageId.Version;
+                            o.Release = string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
+#if RELEASE
+                            o.Environment = "Production";
+#endif 
+#if DEBUG
+                            o.Environment = "Debug";
+#endif
+                        });
+                        UnhandledException += App_UnhandledException;
+                    }
+                }
+                else if (_sentry != null)
+                {
+                    _sentry.Dispose();
+                    UnhandledException -= App_UnhandledException;
+                }
+            }
+        }
+
+        private void App_UnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            SentrySdk.CaptureException(e.Exception);
+
+            // If you want to avoid the application from crashing:
+            e.Handled = true;
         }
 
         /// <summary>

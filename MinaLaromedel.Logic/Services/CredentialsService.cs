@@ -41,6 +41,8 @@ namespace MinaLaromedel
 
         #endregion Authenticate
 
+        public static bool IsCredentialsSaved() => (new PasswordVault()).RetrieveAll().Any();
+
         public static PasswordCredential GetProviderCredential(string providerName) => (new PasswordVault()).FindAllByResource(providerName).FirstOrDefault();
         public static IReadOnlyList<PasswordCredential> GetProviderCredentials() => (new PasswordVault()).RetrieveAll().Where(pc => !string.IsNullOrEmpty(pc.Resource)).ToArray();
     }

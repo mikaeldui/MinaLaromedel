@@ -12,48 +12,13 @@ namespace MinaLaromedel.Services
 {
     public static class SettingsService
     {
-        static SettingsService()
+        private static IPropertySet LocalSettings => ApplicationData.Current.LocalSettings.Values;
+        private static IPropertySet RoamingSettings => ApplicationData.Current.RoamingSettings.Values;
+
+        public static bool IsAutomaticErrorReportingEnabled
         {
-            // Migrate
-            var settings = ApplicationData.Current.LocalSettings.Values;
-            var roamingSettings = ApplicationData.Current.RoamingSettings.Values;
-            if (settings.ContainsKey("username"))
-            {
-                var vault = new PasswordVault();
-                vault.Add(new PasswordCredential("Hermods Novo", (string)settings["username"], (string)settings["password"]));
-
-                settings.Remove("username");
-                settings.Remove("password");
-                try
-                {
-                    roamingSettings.Remove("username");
-                    roamingSettings.Remove("password");
-                } catch { }
-            }
+            get => LocalSettings.ContainsKey("IsAutomaticErrorReportingEnabled") ? (bool)LocalSettings["IsAutomaticErrorReportingEnabled"] : false;
+            set => LocalSettings["IsAutomaticErrorReportingEnabled"] = value;
         }
-
-        public static PasswordCredential GetPasswordCredential(string distributor)
-        {
-            PasswordCredential credential = null;
-
-            var vault = new Windows.Security.Credentials.PasswordVault();
-            var credentialList = vault.FindAllByResource(distributor);
-            if (credentialList.Count > 0)
-            {
-                if (credentialList.Count == 1)
-                {
-                    credential = credentialList[0];
-                }
-                else
-                {
-                    //Will not happen yet
-                    //credential = vault.Retrieve(resourceName, defaultUserName);
-                }
-            }
-
-            return credential;
-        }
-
-        public static bool IsCredentialsSaved() => (new PasswordVault()).RetrieveAll().Any();
     }
 }

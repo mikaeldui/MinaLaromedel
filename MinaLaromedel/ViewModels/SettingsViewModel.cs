@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using MinaLaromedel.Services;
 using MinaLaromedel.Views;
+using Sentry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,6 @@ namespace MinaLaromedel.ViewModels
 {
     public class SettingsViewModel : ViewModelBase
     {
-        private long? _cacheSize;
-
         public SettingsViewModel()
         {
             ClearCache = new RelayCommand(async () => { await ApplicationData.Current.LocalCacheFolder.DeleteAsync(); await RefreshCacheSizeAsync(); });
@@ -31,6 +30,20 @@ namespace MinaLaromedel.ViewModels
 
         public string Username => (new PasswordVault()).FindAllByResource("Hermods Novo").FirstOrDefault()?.UserName;
 
+
+        public ICommand Logout { get; } = new RelayCommand(async () =>
+        {
+            await ApplicationData.Current.LocalFolder.DeleteAsync();
+            ApplicationData.Current.LocalSettings.Values.Clear();
+
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            rootFrame.Navigate(typeof(LoginPage), null);
+        });
+
+        #region Cache
+
+        private long? _cacheSize;
         public long? CacheSize
         {
             get => _cacheSize;
@@ -43,16 +56,6 @@ namespace MinaLaromedel.ViewModels
                 }
             }
         }
-
-        public ICommand Logout { get; } = new RelayCommand(async () =>
-        {
-            await ApplicationData.Current.LocalFolder.DeleteAsync();
-            ApplicationData.Current.LocalSettings.Values.Clear();
-
-            Frame rootFrame = Window.Current.Content as Frame;
-
-            rootFrame.Navigate(typeof(LoginPage), null);
-        });
 
         public ICommand ClearCache { get; }
 
@@ -74,5 +77,20 @@ namespace MinaLaromedel.ViewModels
 
             await UIThread.RunAsync(() => CacheSize = folderSize);
         }
+
+        #endregion Cache
+
+        #region Error Reporting
+
+        public bool IsAutomaticErrorReportingEnabled
+        {
+            get => SettingsService.IsAutomaticErrorReportingEnabled;
+            set
+            {
+                ((App)Application.Current).SentryEnabled = SettingsService.IsAutomaticErrorReportingEnabled = value;
+            }
+        }
+
+        #endregion
     }
 }

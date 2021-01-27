@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
+using Windows.Foundation.Collections;
+using Windows.Security.Credentials;
 using Windows.Storage;
 
 namespace MinaLaromedel.Tasks
@@ -16,6 +18,27 @@ namespace MinaLaromedel.Tasks
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             var deferral = taskInstance.GetDeferral();
+
+            // Credentials from settings to PasswordVault
+            {
+                IPropertySet LocalSettings = ApplicationData.Current.LocalSettings.Values;
+                IPropertySet RoamingSettings = ApplicationData.Current.RoamingSettings.Values;
+
+                if (LocalSettings.ContainsKey("username"))
+                {
+                    var vault = new PasswordVault();
+                    vault.Add(new PasswordCredential("Hermods Novo", (string)LocalSettings["username"], (string)LocalSettings["password"]));
+
+                    LocalSettings.Remove("username");
+                    LocalSettings.Remove("password");
+                    try
+                    {
+                        RoamingSettings.Remove("username");
+                        RoamingSettings.Remove("password");
+                    }
+                    catch { }
+                }
+            }
 
             // From 1.0.5.0
             {

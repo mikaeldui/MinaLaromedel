@@ -52,8 +52,14 @@
                     </Button.Flyout>
                 </Button>
             </StackPanel>
+            <StackPanel x:Name="AutomaticErrorReportingStackPanel" Margin="0,0,0,12">
+                <TextBlock Text="Automatisk felrapportering" FontSize="36" Margin="0,6" />
+                <TextBlock Text="Om du vill att fel ska rapporteras automatiskt så kan du aktivera det här. Rapporterna samlas in av Sentry." Margin="0,6" />
+                <CheckBox Content="Automatisk felrapportering" IsChecked="{Binding IsAutomaticErrorReportingEnabled, Mode=TwoWay}" Margin="0,6,0,0"/>
+                <HyperlinkButton Content="Sentrys sekretesspolicy" NavigateUri="https://sentry.io/privacy/" />
+            </StackPanel>
             <StackPanel x:Name="GitHubStackPanel" Margin="0,0,0,12" >
-                <TextBlock Text="GitHub" FontSize="36" Margin="0,6" />
+                <TextBlock Text="Öppen källkod" FontSize="36" Margin="0,6" />
                 <TextBlock Text="Appen utvecklas öppet på GitHub och du kan skapa din egen version. Bidra gärna med kod, frågor eller förslag på förbättringar!" />
                 <HyperlinkButton Content="github.com/mikaeldui/MinaLaromedel" NavigateUri="https://github.com/mikaeldui/MinaLaromedel" />
             </StackPanel>
