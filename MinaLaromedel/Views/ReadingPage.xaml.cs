@@ -27,6 +27,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
 using MinaLaromedel.Models;
+using MinaLaromedel.Helpers;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -37,6 +38,8 @@ namespace MinaLaromedel.Views
     /// </summary>
     public sealed partial class ReadingPage : Page
     {
+        private AppWindowFullScreenHelper _fullScreenHelper;
+
         public double PageMaxHeight { get; set; }
         public double PageMaxWidth { get; set; }
 
@@ -79,6 +82,10 @@ namespace MinaLaromedel.Views
                 //    Ebook = new EbookViewModel(await EbookStorage.GetEbooksAsync(isbn));
                 //    break;
             }
+
+            _fullScreenHelper = new AppWindowFullScreenHelper(AppWindow);
+            _fullScreenHelper.FullScreenEntered += _fullScreenHelper_FullScreenEntered;
+            _fullScreenHelper.FullScreenExited += _fullScreenHelper_FullScreenExited;
 
             Messenger.Default.Register<ShowEbookPageMessage>(this, Ebook.Isbn, message => 
             {
@@ -158,56 +165,34 @@ namespace MinaLaromedel.Views
 
         #region Full Screen
 
-        private void FullScreenButton_Click(object sender, RoutedEventArgs e)
+        private void _fullScreenHelper_FullScreenExited(object sender, EventArgs e)
         {
-            var configuration = AppWindow.Presenter.GetConfiguration();
-            if (FullScreenButton.Text == "Avsluta helskärmsläge" && _tryExitFullScreen())
+            FullScreenButton.Text = "Helskärmsläge";
+            FullScreenButton.Icon = new SymbolIcon(Symbol.FullScreen);
+        }
+
+        private void _fullScreenHelper_FullScreenEntered(object sender, EventArgs e)
+        {
+            FullScreenButton.Text = "Avsluta helskärmsläge";
+            FullScreenButton.Icon = new SymbolIcon(Symbol.BackToWindow);
+        }
+
+        private void ToggleFullScreen_RoutedEvent(object sender, RoutedEventArgs e)
+        {
+            if (FullScreenButton.Text == "Avsluta helskärmsläge")
             {
-                // Nothing
+                _fullScreenHelper.TryExitFullScreen();
             }
             else
             {
-                if (AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.FullScreen))
-                {
-                    FullScreenButton.Text = "Avsluta helskärmsläge";
-                    FullScreenButton.Icon = new SymbolIcon(Symbol.BackToWindow);
-
-                    _ = Task.Run(async () =>
-                    {
-                        await Task.Delay(500);
-                        await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                        {
-                            AppWindow.Changed += AppWindow_Changed;
-                        });
-                    });
-                }
+                _fullScreenHelper.TryEnterFullScreen();
             }
-        }
-
-        private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
-        {
-            if (args.DidSizeChange)
-                _tryExitFullScreen();
         }
 
         private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Escape)
-                _tryExitFullScreen();
-        }
-
-        private bool _tryExitFullScreen()
-        {
-            if (AppWindow.Presenter.RequestPresentation(AppWindowPresentationKind.Default))
-            {
-                FullScreenButton.Text = "Helskärmsläge";
-                FullScreenButton.Icon = new SymbolIcon(Symbol.FullScreen);
-                AppWindow.Changed -= AppWindow_Changed;
-
-                return true;
-            }
-
-            return false;
+                _fullScreenHelper.TryExitFullScreen();
         }
 
         #endregion Full Screen
@@ -240,8 +225,8 @@ namespace MinaLaromedel.Views
             return await readingWindow.TryShowAsync();
         }
 
-        #endregion TryShowWindowAsync
 
+        #endregion TryShowWindowAsync
 
     }
 }

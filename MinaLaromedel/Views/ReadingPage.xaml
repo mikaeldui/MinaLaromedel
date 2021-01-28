@@ -7,7 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:MinaLaromedel.Controls"
     mc:Ignorable="d"
-    RequestedTheme="Dark" KeyDown="Page_KeyDown">
+    RequestedTheme="Dark" 
+    KeyDown="Page_KeyDown" 
+    DoubleTapped="ToggleFullScreen_RoutedEvent">
 
     <Grid x:Name="MainGrid">
         <FlipView x:Name="EbookFlipView" ItemsSource="{x:Bind EbookOpenings}" RightTapped="EbookFlipView_RightTapped" Background="Black" Holding="EbookFlipView_Holding">
@@ -20,7 +22,7 @@
                     </MenuFlyoutItem>-->
                     <MenuFlyoutItem x:Name="CopyLinkButton" Text="Kopiera länk till sidan" Icon="Link" Click="CopyLinkButton_Click" />
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem x:Name="FullScreenButton" Text="Helskärmsläge" Icon="FullScreen" Click="FullScreenButton_Click" />
+                    <MenuFlyoutItem x:Name="FullScreenButton" Text="Helskärmsläge" Icon="FullScreen" Click="ToggleFullScreen_RoutedEvent" />
                 </MenuFlyout>
             </FlyoutBase.AttachedFlyout>
             <FlipView.ItemsPanel>

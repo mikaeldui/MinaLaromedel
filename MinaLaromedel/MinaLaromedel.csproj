@@ -136,6 +136,7 @@
     </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\LongToSizeConverter.cs" />
+    <Compile Include="Helpers\AppWindowFullScreenHelper.cs" />
     <Compile Include="Helpers\UIThread.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -275,7 +276,9 @@
       <Version>2.1.8</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Clients\Hermods.Novo.Client\Hermods.Novo.Client.csproj">
       <Project>{c472d801-fedb-43d4-9e7c-709551e1a202}</Project>
