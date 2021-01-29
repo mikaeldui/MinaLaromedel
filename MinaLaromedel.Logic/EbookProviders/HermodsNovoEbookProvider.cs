@@ -23,16 +23,9 @@ namespace MinaLaromedel.EbookProviders
         {
             if (credential == null) throw new ArgumentNullException(nameof(credential));
 
-            try
-            {
-                credential.RetrievePassword();
-                await _hermodsNovoClient.AuthenticateAsync(credential.UserName, credential.Password);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            credential.RetrievePassword();
+
+            return await _hermodsNovoClient.TryAuthenticateAsync(credential.UserName, credential.Password);
         }
 
         public void Dispose() => ((IDisposable)_hermodsNovoClient).Dispose();

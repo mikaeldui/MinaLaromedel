@@ -126,14 +126,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.10</Version>
+      <Version>6.2.11</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Clients\Hermods.Novo.Client\Hermods.Novo.Client.csproj">
-      <Project>{c472d801-fedb-43d4-9e7c-709551e1a202}</Project>
-      <Name>Hermods.Novo.Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MinaLaromedel.Logic\MinaLaromedel.Logic.csproj">
       <Project>{cc9f2ffc-790d-4bec-8bf0-2fefd980fa59}</Project>
       <Name>MinaLaromedel.Logic</Name>
