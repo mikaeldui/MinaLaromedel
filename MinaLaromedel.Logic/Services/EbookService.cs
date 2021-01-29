@@ -1,12 +1,9 @@
-﻿using MinaLaromedel.EbookProviders;
-using MinaLaromedel.Models;
-using MinaLaromedel.Storage;
+﻿using MinaLaromedel.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Windows.Security.Credentials;
 
 namespace MinaLaromedel.Services
 {

@@ -1,5 +1,4 @@
 ﻿using GalaSoft.MvvmLight;
-using MinaLaromedel.Services;
 using MinaLaromedel.Storage;
 using System;
 using System.Collections.Generic;
@@ -16,7 +15,6 @@ using GalaSoft.MvvmLight.Messaging;
 using MinaLaromedel.Messages;
 using MinaLaromedel.Tiles;
 using Windows.Storage;
-using MinaLaromedel.Models;
 using MinaLaromedel.Managers;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;

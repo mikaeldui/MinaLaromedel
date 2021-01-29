@@ -18,7 +18,7 @@ namespace MinaLaromedel.Services
         public static bool IsAutomaticErrorReportingEnabled
         {
             get => LocalSettings.ContainsKey(nameof(IsAutomaticErrorReportingEnabled)) ? (bool)LocalSettings[nameof(IsAutomaticErrorReportingEnabled)] : false;
-            set => LocalSettings[nameof(IsAutomaticErrorReportingEnabled)] = value;
+            set => LocalSettings[nameof(IsAutomaticErrorReportingEnabled)] = ErrorService.IsSentryActive = value;
         }
     }
 }

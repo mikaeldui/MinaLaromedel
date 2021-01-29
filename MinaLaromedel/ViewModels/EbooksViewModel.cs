@@ -1,7 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using MinaLaromedel.Collections;
 using MinaLaromedel.Managers;
-using MinaLaromedel.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

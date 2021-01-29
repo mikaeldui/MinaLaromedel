@@ -2,7 +2,6 @@
 using Hermods.Novo;
 using Liber.Onlinebok;
 using MinaLaromedel.Messages;
-using MinaLaromedel.Models;
 using MinaLaromedel.Storage;
 using System;
 using System.Collections.Generic;
@@ -43,36 +42,44 @@ namespace MinaLaromedel.EbookProviders
             switch (ebook.Publisher)
             {
                 case "Liber":
-                    
-                    var hermodsClient = _hermodsNovoClient;
 
-                    LiberOnlinebokDocument document;
-                    LiberOnlinebokAssetsClient assetsClient;
-
-                    using (LiberOnlinebokClient liberClient = await _hermodsNovoClient.GetLiberOnlinebokClientAsync(ebook.ProviderAttributes["url"]))
+                    try
                     {
-                        document = await liberClient.GetDocumentAsync();
-                        assetsClient = await liberClient.GetAssetsClientAsync();
-                    }
 
-                    using (assetsClient)
-                    {
-                        var pageAssets = document.Content.ContentItems.Values.Select(val => (val.OrderingIndex, val.Assets.First().Uri)).ToArray();
+                        var hermodsClient = _hermodsNovoClient;
 
-                        foreach (var asset in pageAssets)
+                        LiberOnlinebokDocument document;
+                        LiberOnlinebokAssetsClient assetsClient;
+
+                        using (LiberOnlinebokClient liberClient = await _hermodsNovoClient.GetLiberOnlinebokClientAsync(ebook.ProviderAttributes["url"]))
                         {
-                            var ebookPage = await assetsClient.GetAssetAsync(asset.Uri);
-
-                            await PageStorage.SavePageAsync(ebook, ebookPage, asset.OrderingIndex);
-
-                            Messenger.Default.Send(new DownloadStatusMessage(Array.IndexOf(pageAssets, asset), pageAssets.Length), ebook.Isbn);
+                            document = await liberClient.GetDocumentAsync();
+                            assetsClient = await liberClient.GetAssetsClientAsync();
                         }
+
+                        using (assetsClient)
+                        {
+                            var pageAssets = document.Content.ContentItems.Values.Select(val => (val.OrderingIndex, val.Assets.First().Uri)).ToArray();
+
+                            foreach (var asset in pageAssets)
+                            {
+                                var ebookPage = await assetsClient.GetAssetAsync(asset.Uri);
+
+                                await PageStorage.SavePageAsync(ebook, ebookPage, asset.OrderingIndex);
+
+                                Messenger.Default.Send(new DownloadStatusMessage(Array.IndexOf(pageAssets, asset), pageAssets.Length), ebook.Isbn);
+                            }
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        throw new EbookDownloadException(ebook, e);
                     }
 
                     break;
 
                 default:
-                    throw new NotImplementedException("This publisher hasn't been implemented yet.");
+                    throw new EbookPublisherNotImplementedException(ebook);
             }
         }
 

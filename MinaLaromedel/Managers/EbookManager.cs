@@ -15,10 +15,11 @@ using MinaLaromedel.Messages;
 using System.Threading;
 using Windows.Security.Credentials;
 using MinaLaromedel.EbookProviders;
-using MinaLaromedel.Models;
 using MinaLaromedel.Services;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Xaml.Controls;
+using Sentry;
+using Windows.UI.Xaml;
 
 namespace MinaLaromedel.Managers
 {
@@ -125,7 +126,7 @@ namespace MinaLaromedel.Managers
                     await provider.DownloadEbookAsync(ebook);
                 }
             }
-            catch
+            catch (EbookException e)
             {
                 ContentDialog downloadErrorDialog = new ContentDialog()
                 {
@@ -140,6 +141,8 @@ namespace MinaLaromedel.Managers
                         await Windows.System.Launcher.LaunchUriAsync(uriBing);
                     })
                 };
+
+                SentrySdk.CaptureException(e);
 
                 await UIThread.RunAsync(async () => await downloadErrorDialog.ShowAsync());
             }

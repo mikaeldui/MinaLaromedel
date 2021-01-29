@@ -88,10 +88,7 @@ namespace MinaLaromedel.ViewModels
         public bool IsAutomaticErrorReportingEnabled
         {
             get => SettingsService.IsAutomaticErrorReportingEnabled;
-            set
-            {
-                ((App)Application.Current).SentryEnabled = SettingsService.IsAutomaticErrorReportingEnabled = value;
-            }
+            set => SettingsService.IsAutomaticErrorReportingEnabled = value;
         }
 
         #endregion
