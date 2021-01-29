@@ -87,7 +87,7 @@ namespace MinaLaromedel
                 Window.Current.Activate();
             }
 
-            if(e.TileId != null && e.TileId.StartsWith("isbn-") && CredentialsService.IsCredentialsSaved())
+            if (e.TileId != null && e.TileId.StartsWith("isbn-") && CredentialsService.IsCredentialsSaved())
             {
                 string isbn;
                 {
@@ -201,17 +201,18 @@ namespace MinaLaromedel
                 else if (_sentry != null)
                 {
                     _sentry.Dispose();
+                    _sentry = null;
                     UnhandledException -= App_UnhandledException;
                 }
+
+                static void App_UnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
+                {
+                    SentrySdk.CaptureException(e.Exception);
+
+                    // If you want to avoid the application from crashing:
+                    e.Handled = true;
+                }
             }
-        }
-
-        private void App_UnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
-        {
-            SentrySdk.CaptureException(e.Exception);
-
-            // If you want to avoid the application from crashing:
-            e.Handled = true;
         }
 
         /// <summary>

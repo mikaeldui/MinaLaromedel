@@ -28,8 +28,9 @@ namespace MinaLaromedel.ViewModels
             }
         }
 
-        public string Username => (new PasswordVault()).FindAllByResource("Hermods Novo").FirstOrDefault()?.UserName;
+        #region Account
 
+        public string Username => (new PasswordVault()).FindAllByResource("Hermods Novo").FirstOrDefault()?.UserName;
 
         public ICommand Logout { get; } = new RelayCommand(async () =>
         {
@@ -40,6 +41,8 @@ namespace MinaLaromedel.ViewModels
 
             rootFrame.Navigate(typeof(LoginPage), null);
         });
+
+        #endregion Account
 
         #region Cache
 
