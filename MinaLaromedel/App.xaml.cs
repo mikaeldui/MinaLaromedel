@@ -182,7 +182,7 @@ namespace MinaLaromedel
                     {
                         _sentry = SentrySdk.Init(o => 
                         {
-                            o.Dsn = new Dsn("https://356c701be29e4197a3b9e31f29ae5051@o511625.ingest.sentry.io/5609165");
+                            o.Dsn = "https://356c701be29e4197a3b9e31f29ae5051@o511625.ingest.sentry.io/5609165";
 
                             Package package = Package.Current;
                             PackageId packageId = package.Id;
