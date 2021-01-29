@@ -18,6 +18,7 @@ using MinaLaromedel.EbookProviders;
 using MinaLaromedel.Models;
 using MinaLaromedel.Services;
 using Windows.ApplicationModel.Core;
+using Windows.UI.Xaml.Controls;
 
 namespace MinaLaromedel.Managers
 {
@@ -113,12 +114,34 @@ namespace MinaLaromedel.Managers
 
             try
             {
-                await provider.DownloadEbookAsync(ebook);
+
+                try
+                {
+                    await provider.DownloadEbookAsync(ebook);
+                }
+                catch
+                {
+                    await provider.AuthenticateAsync(credential);
+                    await provider.DownloadEbookAsync(ebook);
+                }
             }
             catch
             {
-                await provider.AuthenticateAsync(credential);
-                await provider.DownloadEbookAsync(ebook);
+                ContentDialog downloadErrorDialog = new ContentDialog()
+                {
+                    Title = "Kunde inte ladda ner e-bok",
+                    Content = $"E-boken {ebook.Title} (publicerad av {ebook.Publisher}) kunde inte laddas ner. Skapa gärna ett nytt Issue på GitHub om felet inträffar flera gånger.",
+                    CloseButtonText = "Stäng",
+                    PrimaryButtonText = "Öppna GitHub",
+                    PrimaryButtonCommand = new RelayCommand(async () =>
+                    {
+                        var uriBing = new Uri(@"https://github.com/mikaeldui/MinaLaromedel/issues");
+
+                        await Windows.System.Launcher.LaunchUriAsync(uriBing);
+                    })
+                };
+
+                await UIThread.RunAsync(async () => await downloadErrorDialog.ShowAsync());
             }
         }
 
