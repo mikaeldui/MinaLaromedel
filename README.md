@@ -7,6 +7,6 @@ En UWP-app för [Hermods Läromedel](https://novo.hermods.se/?action=ebooks) ska
 <a href='//www.microsoft.com/store/apps/9NP6T3D92P95?cid=storebadge&ocid=badge'><img src='https://developer.microsoft.com/store/badges/images/Swedish_get-it-from-MS.png' alt='Swedish badge' width="284px"/></a>
 
 Appen gav upphov till följande projekt:
- - https://github.com/mikaeldui/HermodsNovoClient
- - https://github.com/mikaeldui/LiberOnlinebokClient
+ - [mikaeldui/HermodsNovoClient](https://github.com/mikaeldui/HermodsNovoClient)
+ - [mikaeldui/LiberOnlinebokClient](https://github.com/mikaeldui/LiberOnlinebokClient)
  
