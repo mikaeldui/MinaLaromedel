@@ -38,9 +38,6 @@ namespace MinaLaromedel.EbookProviders
 
                     try
                     {
-
-                        var hermodsClient = _hermodsNovoClient;
-
                         LiberOnlinebokDocument document;
                         LiberOnlinebokAssetsClient assetsClient;
 
@@ -52,7 +49,7 @@ namespace MinaLaromedel.EbookProviders
 
                         using (assetsClient)
                         {
-                            var pageAssets = document.Content.ContentItems.Values.Select(val => (val.OrderingIndex, val.Assets.First().Uri)).ToArray();
+                            var pageAssets = document.Content.ContentItems.Select(ci => (ci.OrderingIndex, ci.Assets.First().Uri)).ToArray();
 
                             foreach (var asset in pageAssets)
                             {
@@ -83,14 +80,14 @@ namespace MinaLaromedel.EbookProviders
             return hermodsEbooks.Select(ConvertToEbook).ToArray();
         }
 
-        private static EbookChapter[] _getEbookChapters(LiberOnlinebokDocument document) => document.Structure.Root.Children.Select(c => c.Value).Select(c => new EbookChapter
-        {
-            Title = c.Label,
-            PageIndex = document.Content.ContentItems
-                .Select(ci => ci.Value)
+        private static EbookChapter[] _getEbookChapters(LiberOnlinebokDocument document) =>
+            document.Structure.Root.Children.Select(c => new EbookChapter
+            {
+                Title = c.Label,
+                PageIndex = document.Content.ContentItems
                 .First(ci => ci.Uuid == c.ContentId)
                 .OrderingIndex
-        }).ToArray();
+            }).ToArray();
 
         public static Ebook ConvertToEbook(HermodsNovoEbook hermodsNovoEbook) => new Ebook
         {

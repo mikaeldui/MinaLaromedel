@@ -65,19 +65,19 @@ namespace MinaLaromedel.EbookProviders
                 return _activeProviders.Remove((providerName, username));
         }
 
-        private static Type _getProviderTypeFromName(string providerType)
+        private static Type _getProviderTypeFromName(string providerName)
         {
             var type = typeof(IEbookProvider);
             var types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => type.IsAssignableFrom(p));
 
-            var typeWithAttribute = types.FirstOrDefault(o => o.GetCustomAttribute<EbookProviderNameAttribute>().Name == providerType);
+            var typeWithAttribute = types.FirstOrDefault(o => o.GetCustomAttribute<EbookProviderNameAttribute>().Name == providerName);
 
             if (typeWithAttribute != null)
                 return typeWithAttribute;
 
-            return types.FirstOrDefault(t => t.Name.StartsWith(providerType));
+            return types.FirstOrDefault(t => t.Name.StartsWith(providerName));
         }
     }
 }
